@@ -1,6 +1,6 @@
 #include <iostream>
 #include "AST.h"
-//#include "semanticAnalyzer.h"
+#include "semanticAnalyzer.h"
 using namespace std;
 EventList* Globe;
 
@@ -17,8 +17,13 @@ int main()
     }
 
     {
-        //globeScope = currentScope = new Scope();
-        //Globe->check();
+        globeScope = currentScope = new Scope();
+        IntType = (TypeSymbol*) globeScope->putVariable("int",TYPESYMBOL);
+        if (!Globe->check()){
+            cout << "Semantic check failed\n" + SystemError << endl;
+        } else {
+            cout << "Semantic check succeed\n" << endl;
+        }
     }
 
     return 0;

@@ -2,6 +2,42 @@
 #include "ConstHeader.h"
 #include <typeinfo>
 
+bool ArrayVariable::check() {
+    //array call
+    if (this->variableSymbol == nullptr){
+        this->variableSymbol = (VariableSymbol*) currentScope->getVariable(this->name,VARIABLESYMBOL);
+        if (this->variableSymbol == nullptr){
+            SystemError = "Undeclared Variable: " + this->name + "\n";
+            return false;
+        }
+        if (this->variableSymbol->getLevel() != (int)this->position.data.size()){
+            SystemError = "The array was not the same as the declaration";
+            return false;
+        }
+        for (Expression* now : position.data){
+            if (!now->check()){
+                return false;
+            }
+            if (now->type != IntType){
+                SystemError = "There should be INT in the []";
+                return false;
+            }
+        }
+    } else {
+        this->variableSymbol->setLevel((int)this->position.data.size());
+        for (Expression* now : position.data){
+            if (!now->check()){
+                return false;
+            }
+            if (now->type != IntType){
+                SystemError = "There should be INT in the []";
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 ArrayVariable::ArrayVariable(string name, ExpressionList& position):Variable(name) {
     this->position = position;
     this->classType = ARRAYVARIABLE_CLASS;
@@ -15,6 +51,61 @@ Attribute::Attribute(string name, string attribute) {
     this->name = name;
     this->attribute = attribute;
     this->classType = ATTRIBUTE_CLASS;
+}
+
+bool Attribute::check() {
+    VariableSymbol* thisVariable = (VariableSymbol*) currentScope->getVariable(this->name,VARIABLESYMBOL);
+    if (thisVariable == nullptr){
+        SystemError = "Undeclared Variable: " + this->name + "\n";
+        return false;
+    }
+    if (thisVariable->type == IntType){
+        SystemError = "Cannot find attribute of a int Type.";
+        return false;
+    }
+    if (!thisVariable->type->memberScope->contains(this->attribute)){
+        SystemError = "Cannot find attribute from this struct.";
+        return false;
+    }
+    this->type = IntType;
+    this->left = true;
+    return true;
+}
+
+bool BinaryExpression::check() {
+    if (!this->Left->check() || !this->Right->check()){
+        return false;
+    }
+    if (this->Left->type != this->Right->type){
+        SystemError = "Binary Expression Unmatch";
+        return false;
+    }
+    if (!this->Left->left){
+        SystemError = "Should be left value during assign";
+        switch (this->command) {
+            case ASSIGN_OP :
+                return false;
+            case DIVIDE_ASSIGN_OP:
+                return false;
+            case MINUS_ASSIGN_OP:
+                return false;
+            case PLUS_ASSIGN_OP:
+                return false;
+            case MULTIPLY_ASSIGN_OP:
+                return false;
+            default:;
+        }
+    }
+    if (this->Left->type != IntType
+        && this->command != ASSIGN_OP
+        && this->command != SEQ_OP
+        && this->command != SNE_OP){
+        SystemError = "Should be Int in the binary expression";
+        return false;
+    }
+    this->type = this->Left->type;
+    this->left = false;
+    return true;
 }
 
 BinaryExpression::BinaryExpression(Expression& Left, Expression& Right, int command) {
@@ -37,6 +128,13 @@ BlockStatement::BlockStatement(EventList& events) {
     this->classType = BLOCK_CLASS;
 }
 
+bool BlockStatement::check() {
+    for (Statement* now: this->events.data){
+        if (!now->check()) return false;
+    }
+    return true;
+}
+
 BranchStatement::BranchStatement() {
     this->classType = BRANCH_CLASS;
 }
@@ -56,6 +154,27 @@ BranchStatement::BranchStatement(Expression& condition, Statement& AcceptStateme
     this->classType = BRANCH_CLASS;
 }
 
+bool BranchStatement::check() {
+    if (!this->condition->check()){
+        return false;
+    }
+    if (!this->condition->type == IntType){
+        SystemError = "Should be Int type in branch condition!";
+        return false;
+    }
+    leftScope = currentScope = new Scope(currentScope);
+    if (!this->AcceptStatement){
+        return false;
+    }
+    currentScope = currentScope->prev();
+    rightScope = currentScope = new Scope(currentScope);
+    if (!this->DenyStatement){
+        return false;
+    }
+    currentScope = currentScope->prev();
+    return true;
+}
+
 Declaration::Declaration(Type& type, VariableList& variableList) {
     this->type = type;
     this->variableList = variableList;
@@ -67,6 +186,36 @@ Declaration::Declaration(string type_name,VariableList& variableList){
 	this->type_name = type_name;
 	this->variableList = variableList;
     this->classType = DECLARE_CLASS;
+}
+
+bool Declaration::check() {
+    if (this->type_name != ""){
+        for (Variable* now : this->variableList.data){
+            VariableSymbol* nowSymbol = (VariableSymbol*) currentScope->putVariable(now->name,VARIABLESYMBOL);
+            if (nowSymbol == nullptr) {
+                SystemError = "Variable Redeclare: "+ now->name + "\n";
+                return false;
+            }
+            nowSymbol->setType(IntType);
+            now->variableSymbol = nowSymbol;
+            now->check();
+        }
+    } else {
+        if (!this->type.check()) return false;
+        TypeSymbol* thisType = type.typeSymbol;
+        for (Variable* now : this->variableList.data){
+            VariableSymbol* nowSymbol = (VariableSymbol*) currentScope->putVariable(now->name,VARIABLESYMBOL);
+            if (nowSymbol == nullptr) {
+                SystemError = "Variable Redeclare.";
+                return false;
+            }
+            nowSymbol->setType(thisType);
+            now->variableSymbol = nowSymbol;
+            now->check();
+        }
+    }
+
+    return true;
 }
 
 EventList::EventList() {
@@ -83,6 +232,16 @@ void EventList::insert(Statement& now) {
     this->data.push_front(&now);
 }
 
+bool EventList::check() {
+    for (auto it = this->data.begin(); it != this->data.end(); it++){
+        Statement* event = *it;
+        if (!event->check()){
+            return false;
+        }
+    }
+    return true;
+}
+
 ExpressionList::ExpressionList() {
     this->classType = EXPRESSIONLIST_CLASS;
 }
@@ -96,6 +255,38 @@ ExpressionList::ExpressionList(Expression& now) {
 
 void ExpressionList::insert(Expression &now) {
     data.push_front(&now);
+}
+
+bool Function::check() {
+    FunctionSymbol* thisFunction =(FunctionSymbol*) globeScope->putVariable(this->name,FUNCTIONSYMBOL);
+    if (thisFunction == nullptr){
+        SystemError = "Function Redeclare:" + this->name + "\n";
+        return false;
+    }
+    thisFunction->returnType = IntType;
+    currentScope = new Scope(currentScope);
+    thisFunction->parameterScope = currentScope;
+    for (Variable* parameter : parameters.data){
+        if (!parameter->check()){
+            return false;
+        }
+        if (parameter->type != IntType){
+            SystemError = "Parameter should be Int type other than " + parameter->type_name + "\n";
+            return false;
+        }
+        //TODO
+        thisFunction->addParameter(parameter->variableSymbol);
+    }
+    currentScope = new Scope(currentScope);
+
+    if (!this->functionBody.check()){
+        return false;
+    }
+
+    currentScope = currentScope->prev();
+    currentScope = currentScope->prev();
+    this->functionSymbol = thisFunction;
+    return true;
 }
 
 Function::Function(string type_name,string name,BlockStatement& functionBody){
@@ -121,11 +312,63 @@ FunctionCall::FunctionCall(string name, ExpressionList& parameters) {
     this->classType = FUNCTIONCALL_CLASS;
 }
 
+bool FunctionCall::check() {
+    FunctionSymbol *thisFunction = (FunctionSymbol *) globeScope->getVariable(this->name,FUNCTIONSYMBOL);
+    if (thisFunction->parameterVariable.size() != this->parameters.data.size()){
+        SystemError = "The number of parameters are not matched\n" ;
+        return false;
+    }
+    for (Expression* now : this->parameters.data){
+        if (!now->check()) return false;
+        if (now->type != IntType) {
+            SystemError = "Symbol Error Should be in Int Value\n" ;
+            return false;
+        }
+    }
+    this->left = false;
+    this->type = IntType;
+}
+
 InitVariable::InitVariable(string name, Expression& initializer, int command):Variable(name) {
     this->command = command;
     this->initializer = &initializer;
     this->classType = INITVARIABLE_CLASS;
 }
+
+bool InitVariable::check() {
+    if (!initializer->check()){
+        return false;
+    }
+    if (initializer->type != IntType){
+        SystemError = "The initializer should be INT type\n";
+        return false;
+    }
+}
+
+bool InitArrayVariable::check() {
+    this->variableSymbol->setLevel((int)this->position.data.size());
+    if (this->variableSymbol->getLevel() > 1){
+        SystemError = "We can only initialize one dimensional array yet.\n";
+        return false;
+    }
+    for (Expression* now : position.data){
+        if (!now->check()){
+            return false;
+        }
+        if (now->type != IntType){
+            SystemError = "There should be INT in the []";
+            return false;
+        }
+    }
+    for (Expression* now : this->initializer.data){
+        if (!now->check()) return false;
+        if (now->type != IntType){
+            SystemError = "The initializer should be INT type\n";
+            return false;
+        }
+    }
+}
+
 
 InitArrayVariable::InitArrayVariable(ArrayVariable& preview,ExpressionList& initializer,int command) {
 	this->position = preview.position;
@@ -133,6 +376,28 @@ InitArrayVariable::InitArrayVariable(ArrayVariable& preview,ExpressionList& init
     this->command = command;
     this->initializer = initializer;
     this->classType = INITARRAYVARIABLE_CLASS;
+}
+
+bool JumpStatement::check() {
+    if (this->returnValue == nullptr){
+        if (!currentScope->inloop()){
+            SystemError = "Break or Continue Should be in a Loop\n";
+            return false;
+        }
+    } else {
+        if (!this->returnValue->check()){
+            return false;
+        } else {
+            if (returnValue->type != IntType){
+                SystemError = "Return Value should be Int\n";
+                return false;
+            }
+        }
+    }
+}
+
+JumpStatement::JumpStatement(Expression &returnValue) {
+    this->returnValue = &returnValue;
 }
 
 JumpStatement::JumpStatement() {
@@ -147,6 +412,12 @@ JumpStatement::JumpStatement(int command) {
 Literal::Literal(int data) {
 	this->data = data;
     this->classType = LITERAL_CLASS;
+}
+
+bool Literal::check() {
+    type = IntType;
+    this->left = false;
+    return true;
 }
 
 void Literal::print(){
@@ -165,6 +436,25 @@ LoopStatement::LoopStatement(Expression &initializer, Expression &condition, Exp
     this->classType = LOOP_CLASS;
 }
 
+bool LoopStatement::check()  {
+    if (!this->initializer->check() ||
+        !this->condition->check() ||
+        !this->iteration->check())
+        return false;
+    if (this->condition->type != IntType){
+        SystemError = "Should be Int type in loop condition!";
+        return false;
+    }
+    loopScope = currentScope = new Scope(currentScope,LOOPSCOPE);
+
+    if (!this->loopBody->check()){
+        return false;
+    }
+
+    currentScope = currentScope->prev();
+    return true;
+}
+
 Type::Type(Declaration newDeclaration) {
     this->declarationList = list<Declaration*>();
     this->declarationList.push_front(&newDeclaration);
@@ -174,7 +464,40 @@ Type::Type(Declaration newDeclaration) {
 
 Type::Type(string name){
     this->name = name;
+    this->declare = false;
     this->classType = TYPE_CLASS;
+}
+
+bool Type::check() {
+    if (this->declare){
+        if (name == ""){
+            this->typeSymbol = globeScope->putAnonymousType();
+        } else {
+            this->typeSymbol =(TypeSymbol*) globeScope->putVariable(name,TYPESYMBOL);
+            if (this->typeSymbol == nullptr){
+                SystemError = "Type Redeclare: " + name + "\n";
+                return false;
+            }
+        }
+        currentScope = new Scope(currentScope);
+        typeSymbol->memberScope = currentScope;
+        for (Declaration* declaration: declarationList){
+            declaration->check();
+            for (Variable* variable : declaration->variableList.data){
+                typeSymbol->addMember(variable->variableSymbol);
+            }
+        }
+        currentScope = currentScope->prev();
+    } else {
+        TypeSymbol* thisType =(TypeSymbol*) globeScope->getVariable(name,TYPESYMBOL);
+        if (thisType == nullptr){
+            SystemError = "Undeclared Type:" + name + "\n";
+            return false;
+        } else {
+            this->typeSymbol = thisType;
+        }
+    }
+    return true;
 }
 
 void Type::insert(Declaration newDeclaration) {
@@ -195,6 +518,20 @@ UnaryExpression::UnaryExpression(Expression& child, int command) {
     this->classType = UNARY_CLASS;
 }
 
+bool UnaryExpression::check() {
+    if (!child->check()){
+        return false;
+    }
+    if (child->type != IntType){
+        SystemError = "child type of Unary expression should be int type";
+        return false;
+    }
+    if (!child->left && ( command == INC_OP || command == DEC_OP)){
+        SystemError = "should be lvalue due to ++ or --";
+        return false;
+    }
+    return true;
+}
 
 Variable::Variable(string name){
     this->name = name;
@@ -207,6 +544,20 @@ Variable::Variable(string type_name,string name){
 	this->name = name;
     this->classType = VARIABLE_CLASS;
 }
+
+bool Variable::check() {
+    // variable ask
+    if (this->variableSymbol == nullptr){
+        this->variableSymbol = (VariableSymbol*) currentScope->getVariable(this->name,VARIABLESYMBOL);
+        if (this->variableSymbol == nullptr){
+            SystemError = "Undeclared Variable: " + this->name + "\n";
+            return false;
+        }
+    }
+    this->left = true;
+    return true;
+}
+
 
 void VariableList::insert(Variable now){
     data.push_front(&now);

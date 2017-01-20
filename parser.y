@@ -148,7 +148,7 @@ blockStatement : LC Statements RC {$$ = new BlockStatement(*$2);}
 
 jumpStatement : CONT SEMI {$$ = new JumpStatement(CONT_OP);}
 | BREAK SEMI {$$ = new JumpStatement(BREAK_OP);}
-| RETURN SEMI {$$ = new JumpStatement(RETURN_OP);}
+| RETURN expression SEMI {$$ = new JumpStatement(*$2);}
 ;
 
 branchStatement : IF expression THEN Statement ELSE Statement {$$ = new BranchStatement(*$2,*$4,*$6);}
