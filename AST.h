@@ -19,41 +19,41 @@ public:
 
 class Statement : public Node{
 public:
-	virtual bool check(){}
+	virtual bool check() = 0;
 };
 
 class Expression: public Statement{
 public:
-    TypeSymbol* type;
+    shared_ptr<TypeSymbol> type;
     bool left;
-    virtual bool check(){}
+    virtual bool check() = 0;
 };
 
 class EventList : public Node{
 public:
     EventList();
-    list<Statement*> data;
-    EventList(Statement& now);
-    void insert(Statement& now);
+    list<shared_ptr<Statement>> data;
+    EventList(Statement* now); //use by parser
+    void insert(Statement* now); //use by parser
 	bool check();
 };
 
 class ExpressionList : public Node {
 public:
-    list<Expression*> data;
-    ExpressionList(Expression& now);
+    list<shared_ptr<Expression>> data;
+    ExpressionList(Expression* now); //use by parser
     ExpressionList();
-    void insert(Expression& now);
+    void insert(Expression* now); //use by parser
 };
 
 class Variable : public Expression {
 public:	
 	string name;
 	string type_name;
-    VariableSymbol* variableSymbol;
+    shared_ptr<VariableSymbol> variableSymbol;
     Variable(){}
-    Variable(string name);
-	Variable(string type_name,string name);
+    Variable(string name); //use by parser
+	Variable(string type_name,string name); //use by parser
     virtual bool check();
 };
 
@@ -61,15 +61,15 @@ class ArrayVariable: public Variable{
 public:
     ExpressionList position;
     ArrayVariable():Variable(){}
-    ArrayVariable(string name,ExpressionList& position);
+    ArrayVariable(string name,ExpressionList& position); //use by parser
     virtual bool check();
 };
 
 class InitVariable: public Variable{
 	int command;
-    Expression* initializer;
+    shared_ptr<Expression> initializer;
 public:
-	InitVariable(string name,Expression& initializer,int command);
+	InitVariable(string name,Expression* initializer,int command); //use by parser
     bool check();
 };
 
@@ -78,16 +78,16 @@ class InitArrayVariable : public ArrayVariable{
 	int command;
     ExpressionList initializer;
 public:
-    InitArrayVariable(ArrayVariable& preview,ExpressionList& initializer,int command);
+    InitArrayVariable(ArrayVariable& preview,ExpressionList& initializer,int command); //use by parser
     bool check();
 };
 
 class VariableList : public Node{
 public:
-    list<Variable*> data;
+    list<shared_ptr<Variable>> data;
     VariableList(){}
-    VariableList(Variable now);
-    void insert(Variable now);
+    VariableList(Variable* now);
+    void insert(Variable* now);
 };
 
 class Declaration;
@@ -95,25 +95,25 @@ class Declaration;
 class Type : public Statement{
     string name;
     bool declare;
-    list<Declaration*> declarationList;
+    list<shared_ptr<Declaration>> declarationList;
 public:
-    TypeSymbol *typeSymbol;
+    shared_ptr<TypeSymbol> typeSymbol;
     Type(){}
-	Type(string name);
-    Type(Declaration newDeclaration);
-    void getName(string name);
-    void insert(Declaration newDeclaration);
+	Type(string name); //use by parser
+    Type(Declaration* newDeclaration); //use by parser
+    void getName(string name); //use by parser
+    void insert(Declaration* newDeclaration); //use by parser
     bool check();
 };
 
 class Declaration : public Statement{
-    Type type;
+    shared_ptr<Type> type;
 	string type_name;
 public:
     VariableList variableList;
     Declaration(){}
-    Declaration(Type& type,VariableList& variableList);
-	Declaration(string type_name,VariableList& variableList);
+    Declaration(Type* type,VariableList& variableList); //use by parser
+	Declaration(string type_name,VariableList& variableList); //use by parser
     bool check();
 };
 
@@ -130,7 +130,7 @@ class Attribute : public Expression{
     string attribute;
 public:
     Attribute();
-    Attribute(string name,string attribute);
+    Attribute(string name,string attribute); //use by parser
     bool check();
 };
 
@@ -140,27 +140,27 @@ class FunctionCall : public Expression{
     FunctionCall();
 
 public:
-    FunctionCall(string name,ExpressionList& parameters);
+    FunctionCall(string name,ExpressionList& parameters); //use by parser
     bool check();
 };
 
 class UnaryExpression : public Expression{
     int command;
-    Expression* child;
+    shared_ptr<Expression> child;
     UnaryExpression();
 
 public:
-    UnaryExpression(Expression& child,int command);
+    UnaryExpression(Expression* child,int command); //use by parser
     bool check();
 };
 
 class BinaryExpression : public Expression{
     int command;
-    Expression *Left, *Right;
+    shared_ptr<Expression> Left, Right;
     BinaryExpression();
 
 public:
-    BinaryExpression(Expression& Left,Expression& Right,int command);
+    BinaryExpression(Expression* Left,Expression* Right,int command); //use by parser
     bool check();
 };
 
@@ -173,35 +173,35 @@ public:
 };
 
 class BranchStatement : public Statement{
-    Expression *condition;
-    Statement *AcceptStatement;
-    Statement *DenyStatement;
+    shared_ptr<Expression> condition;
+    shared_ptr<Statement> AcceptStatement;
+    shared_ptr<Statement> DenyStatement;
     bool hasDenyStatement;
 public:
-    Scope *leftScope,*rightScope;
+    shared_ptr<Scope> leftScope,rightScope;
     BranchStatement();
-    BranchStatement(Expression& condition, Statement& AcceptStatement);
-    BranchStatement(Expression& condition, Statement& AcceptStatement, Statement& DenyStatement);
+    BranchStatement(Expression* condition, Statement* AcceptStatement); //use by parser
+    BranchStatement(Expression* condition, Statement* AcceptStatement, Statement* DenyStatement); //use by parser
     bool check();
 };
 
 class JumpStatement : public Statement{
     int command;
-    Expression* returnValue;
+    shared_ptr<Expression> returnValue;
 public:
     JumpStatement();
-    JumpStatement(Expression& returnValue);
-    JumpStatement(int command);
+    JumpStatement(Expression* returnValue); //use by parser
+    JumpStatement(int command); //use by parser
     bool check();
 };
 
 class LoopStatement : public Statement{
-    Expression *initializer,*condition,*iteration;
-    Statement *loopBody;
+    shared_ptr<Expression> initializer,condition,iteration;
+    shared_ptr<Statement> loopBody;
 public:
-    Scope *loopScope;
+    shared_ptr<Scope> loopScope;
     LoopStatement();
-    LoopStatement(Expression &initializer,Expression &condition,Expression &iteration,Statement &loopBody);
+    LoopStatement(Expression *initializer,Expression *condition,Expression *iteration,Statement *loopBody); //use by parser
     bool check();
 };
 
@@ -211,13 +211,13 @@ class Function : public Statement{
     string name;
     string type_name;
     VariableList parameters;
-    BlockStatement functionBody;
+    shared_ptr<BlockStatement> functionBody;
 
 public:
-    FunctionSymbol* functionSymbol;
+    shared_ptr<FunctionSymbol> functionSymbol;
     Function(){}
-    Function(string type_name,string name,VariableList& parameterList,BlockStatement& functionBody);
-    Function(string type_name,string name,BlockStatement& functionBody);
+    Function(string type_name,string name,VariableList& parameterList,BlockStatement* functionBody); //use by parser
+    Function(string type_name,string name,BlockStatement* functionBody); //use by parser
     bool check();
 };
 

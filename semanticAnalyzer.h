@@ -2,6 +2,7 @@
 #define SEMANTICANALYZER_H_INCLUDED
 using namespace std;
 #include<map>
+#include <memory>
 #include <vector>
 #include "ConstHeader.h"
 
@@ -19,55 +20,56 @@ public:
 
 class TypeSymbol : public Symbol{
 public:
-    Scope* memberScope;
-    vector<VariableSymbol*> members;
-    void addMember(VariableSymbol*);
+    shared_ptr<Scope> memberScope;
+    vector<shared_ptr<VariableSymbol>> members;
+    //TODO shared pointer
+    void addMember(shared_ptr<VariableSymbol>);
     TypeSymbol(int ID,int SymbolType);
 };
 
 class VariableSymbol : public Symbol{
     int level;
 public:
-    TypeSymbol* type;
+    shared_ptr<TypeSymbol> type;
     int getLevel();
     void setLevel(int level);
     VariableSymbol(int ID,int SymbolType);
-    void setType(TypeSymbol* type);
+    void setType(shared_ptr<TypeSymbol> type);
 };
 
 class FunctionSymbol : public Symbol{
 
 public:
-    TypeSymbol* returnType;
-    Scope* parameterScope;
-    vector<VariableSymbol*> parameterVariable;
-    void addParameter(VariableSymbol* variableSymbol);
+    shared_ptr<TypeSymbol> returnType;
+    shared_ptr<Scope> parameterScope;
+    vector<shared_ptr<VariableSymbol>> parameterVariable;
+    void addParameter(shared_ptr<VariableSymbol> variableSymbol);
     FunctionSymbol(int ID,int SymbolType);
 };
 
 class Scope{
-    map<string,Symbol*> dict;
+    map<string,shared_ptr<Symbol>> dict;
     int ScopeType;
-    Scope* parentScope;
-    Scope* prevScope;
+    shared_ptr<Scope> parentScope;
+    shared_ptr<Scope> prevScope;
 public:
     Scope(){}
-    Scope(Scope* parentScope,int scopeType);
-	Scope(Scope* parentScope);
-    Scope* prev();
+    Scope(shared_ptr<Scope> parentScope,int scopeType);
+	Scope(shared_ptr<Scope> parentScope);
+    shared_ptr<Scope> prev();
     void tag();
     bool inloop();
-    Symbol* putVariable(string variable,int SymbolType);
-    TypeSymbol* putAnonymousType();
+    shared_ptr<Symbol> putVariable(string variable,int SymbolType);
+    shared_ptr<TypeSymbol> putAnonymousType();
     bool foundVariable(string variable,int SymbolType);
-    Symbol* getVariable(string variable,int SymbolType);
+    shared_ptr<Symbol> getVariable(string variable,int SymbolType);
     bool contains(string variable);
 };
 
 extern int counter;
-extern Scope* currentScope;
-extern Scope* globeScope;
-extern TypeSymbol* IntType;
+extern shared_ptr<Scope> currentScope;
+extern shared_ptr<Scope> globeScope;
+extern shared_ptr<TypeSymbol> IntType;
 extern string SystemError;
 
 

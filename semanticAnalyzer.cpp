@@ -12,38 +12,38 @@ bool Scope::foundVariable(string variable,int SymbolType){
     return parentScope->foundVariable(variable,SymbolType);
 }
 
-Scope::Scope(Scope *parentScope,int scopeType) {
-    dict = map<string,Symbol*>();
+Scope::Scope(shared_ptr<Scope> parentScope,int scopeType) {
+    dict = map<string,shared_ptr<Symbol>>();
     this->parentScope = parentScope;
     this->ScopeType = scopeType;
     this->prevScope = parentScope;
 }
 
-Scope::Scope(Scope *parentScope) {
-    dict = map<string,Symbol*>();
+Scope::Scope(shared_ptr<Scope> parentScope) {
+    dict = map<string,shared_ptr<Symbol>>();
     this->parentScope = parentScope;
     this->ScopeType = NORMALSCOPE;
     this->prevScope = parentScope;
 }
 
-TypeSymbol* Scope::putAnonymousType() {
+shared_ptr<TypeSymbol> Scope::putAnonymousType() {
     ++counter;
     return new TypeSymbol(counter,TYPESYMBOL);
 }
 
-void TypeSymbol::addMember(VariableSymbol *variableSymbol) {
+void TypeSymbol::addMember(shared_ptr<VariableSymbol> variableSymbol) {
     members.push_back(variableSymbol);
 }
 
-void FunctionSymbol::addParameter(VariableSymbol *variableSymbol) {
+void FunctionSymbol::addParameter(shared_ptr<VariableSymbol> variableSymbol) {
     parameterVariable.push_back(variableSymbol);
 }
 
-Scope* Scope::prev() {
+shared_ptr<Scope> Scope::prev() {
     return prevScope;
 }
 
-Symbol* Scope::putVariable(string variable,int SymbolType) {
+shared_ptr<Symbol> Scope::putVariable(string variable,int SymbolType) {
 	cout << "put " + variable + "" << endl;
     if (contains(variable)) return nullptr;
     ++counter;
@@ -64,7 +64,7 @@ Symbol::Symbol(int ID, int SymbolType) {
 
 bool Symbol::hasType(int SymbolType) {return this->SymbolType == SymbolType;}
 
-Symbol* Scope::getVariable(string variable, int SymbolType) {
+shared_ptr<Symbol> Scope::getVariable(string variable, int SymbolType) {
     if (contains(variable) && dict[variable]->hasType(SymbolType)) return dict[variable];
     if (parentScope == nullptr) return nullptr;
     return parentScope->getVariable(variable,SymbolType);
@@ -87,7 +87,7 @@ bool Scope::inloop() {
     return this->prev()->inloop();
 }
 
-void VariableSymbol::setType(TypeSymbol *type) {
+void VariableSymbol::setType(shared_ptr<TypeSymbol>  type) {
     this->type = type;
 }
 
@@ -99,8 +99,8 @@ FunctionSymbol::FunctionSymbol(int ID, int SymbolType):Symbol(ID,SymbolType) {}
 
 
 int counter = 1234567;
-Scope* currentScope;
-Scope* globeScope;
-TypeSymbol* IntType;
+shared_ptr<Scope> currentScope;
+shared_ptr<Scope> globeScope;
+shared_ptr<TypeSymbol> IntType;
 string SystemError = "";
 

@@ -1,11 +1,10 @@
 #include "AST.h"
 #include "ConstHeader.h"
-#include <typeinfo>
 
 bool ArrayVariable::check() {
     //array call
     if (this->variableSymbol == nullptr){
-        this->variableSymbol = (VariableSymbol*) currentScope->getVariable(this->name,VARIABLESYMBOL);
+        this->variableSymbol = make_shared(currentScope->getVariable(this->name,VARIABLESYMBOL)) ;
         if (this->variableSymbol == nullptr){
             SystemError = "Undeclared Variable: " + this->name + "\n";
             return false;
@@ -14,7 +13,8 @@ bool ArrayVariable::check() {
             SystemError = "The array was not the same as the declaration";
             return false;
         }
-        for (Expression* now : position.data){
+
+        for (shared_ptr<Expression> now : position.data){
             if (!now->check()){
                 return false;
             }
@@ -25,7 +25,7 @@ bool ArrayVariable::check() {
         }
     } else {
         this->variableSymbol->setLevel((int)this->position.data.size());
-        for (Expression* now : position.data){
+        for (shared_ptr<Expression> now : position.data){
             if (!now->check()){
                 return false;
             }
@@ -54,7 +54,7 @@ Attribute::Attribute(string name, string attribute) {
 }
 
 bool Attribute::check() {
-    VariableSymbol* thisVariable = (VariableSymbol*) currentScope->getVariable(this->name,VARIABLESYMBOL);
+    shared_ptr<VariableSymbol> thisVariable = make_shared(currentScope->getVariable(this->name,VARIABLESYMBOL));
     if (thisVariable == nullptr){
         SystemError = "Undeclared Variable: " + this->name + "\n";
         return false;
@@ -108,9 +108,9 @@ bool BinaryExpression::check() {
     return true;
 }
 
-BinaryExpression::BinaryExpression(Expression& Left, Expression& Right, int command) {
-    this->Left = &Left;
-    this->Right = &Right;
+BinaryExpression::BinaryExpression(Expression* Left, Expression* Right, int command) {
+    this->Left = shared_ptr(Left);
+    this->Right = shared_ptr(Right);
     this->command = command;
     this->classType = BINARY_CLASS;
 }
@@ -129,7 +129,7 @@ BlockStatement::BlockStatement(EventList& events) {
 }
 
 bool BlockStatement::check() {
-    for (Statement* now: this->events.data){
+    for (shared_ptr<Statement> now: this->events.data){
         if (!now->check()) return false;
     }
     return true;
@@ -139,17 +139,17 @@ BranchStatement::BranchStatement() {
     this->classType = BRANCH_CLASS;
 }
 
-BranchStatement::BranchStatement(Expression& condition, Statement& AcceptStatement) {
-    this->condition = &condition;
-    this->AcceptStatement = &AcceptStatement;
+BranchStatement::BranchStatement(Expression* condition, Statement* AcceptStatement) {
+    this->condition = shared_ptr(condition);
+    this->AcceptStatement = shared_ptr(AcceptStatement);
     this->hasDenyStatement = false;
     this->classType = BRANCH_CLASS;
 }
 
-BranchStatement::BranchStatement(Expression& condition, Statement& AcceptStatement, Statement& DenyStatement) {
-    this->condition = &condition;
-    this->AcceptStatement = &AcceptStatement;
-    this->DenyStatement = &DenyStatement;
+BranchStatement::BranchStatement(Expression* condition, Statement* AcceptStatement, Statement* DenyStatement) {
+    this->condition = shared_ptr(condition);
+    this->AcceptStatement = shared_ptr(AcceptStatement);
+    this->DenyStatement = shared_ptr(DenyStatement);
     this->hasDenyStatement = true;
     this->classType = BRANCH_CLASS;
 }
@@ -175,8 +175,8 @@ bool BranchStatement::check() {
     return true;
 }
 
-Declaration::Declaration(Type& type, VariableList& variableList) {
-    this->type = type;
+Declaration::Declaration(Type* type, VariableList& variableList) {
+    this->type = shared_ptr(type);
     this->variableList = variableList;
     this->classType = DECLARE_CLASS;
 }
@@ -190,8 +190,8 @@ Declaration::Declaration(string type_name,VariableList& variableList){
 
 bool Declaration::check() {
     if (this->type_name != ""){
-        for (Variable* now : this->variableList.data){
-            VariableSymbol* nowSymbol = (VariableSymbol*) currentScope->putVariable(now->name,VARIABLESYMBOL);
+        for (shared_ptr<Variable> now : this->variableList.data){
+            shared_ptr<VariableSymbol> nowSymbol = make_shared(currentScope->putVariable(now->name,VARIABLESYMBOL)) ;
             if (nowSymbol == nullptr) {
                 SystemError = "Variable Redeclare: "+ now->name + "\n";
                 return false;
@@ -202,9 +202,9 @@ bool Declaration::check() {
         }
     } else {
         if (!this->type.check()) return false;
-        TypeSymbol* thisType = type.typeSymbol;
-        for (Variable* now : this->variableList.data){
-            VariableSymbol* nowSymbol = (VariableSymbol*) currentScope->putVariable(now->name,VARIABLESYMBOL);
+        shared_ptr<TypeSymbol> thisType = this->type->typeSymbol;
+        for (shared_ptr<Variable> now : this->variableList.data){
+            shared_ptr<VariableSymbol> nowSymbol = make_shared(currentScope->putVariable(now->name,VARIABLESYMBOL));
             if (nowSymbol == nullptr) {
                 SystemError = "Variable Redeclare.";
                 return false;
@@ -222,19 +222,18 @@ EventList::EventList() {
     this->classType = EVENTLIST_CLASS;
 }
 
-EventList::EventList(Statement& now) {
-    this->data = list<Statement*>();
-    this->data.push_front(&now);
+EventList::EventList(Statement* now) {
+    this->data = list<shared_ptr<Statement>>();
+    this->data.push_front(shared_ptr<Statement>(now));
     this->classType = EVENTLIST_CLASS;
 }
 
-void EventList::insert(Statement& now) {
-    this->data.push_front(&now);
+void EventList::insert(Statement* now) {
+    this->data.push_front(shared_ptr<Statement>(now));
 }
 
 bool EventList::check() {
-    for (auto it = this->data.begin(); it != this->data.end(); it++){
-        Statement* event = *it;
+    for (shared_ptr<Statement> event : this->data){
         if (!event->check()){
             return false;
         }
@@ -247,18 +246,18 @@ ExpressionList::ExpressionList() {
 }
 
 
-ExpressionList::ExpressionList(Expression& now) {
-    data = list<Expression*>();
-    data.push_front(&now);
+ExpressionList::ExpressionList(Expression* now) {
+    data = list<shared_ptr<Expression>>();
+    data.push_front(shared_ptr<Expression>(now));
     this->classType = EXPRESSIONLIST_CLASS;
 }
 
-void ExpressionList::insert(Expression &now) {
-    data.push_front(&now);
+void ExpressionList::insert(Expression* now) {
+    data.push_front(shared_ptr<Expression>(now));
 }
 
 bool Function::check() {
-    FunctionSymbol* thisFunction =(FunctionSymbol*) globeScope->putVariable(this->name,FUNCTIONSYMBOL);
+    shared_ptr<FunctionSymbol> thisFunction = make_shared(globeScope->putVariable(this->name,FUNCTIONSYMBOL));
     if (thisFunction == nullptr){
         SystemError = "Function Redeclare:" + this->name + "\n";
         return false;
@@ -266,7 +265,7 @@ bool Function::check() {
     thisFunction->returnType = IntType;
     currentScope = new Scope(currentScope);
     thisFunction->parameterScope = currentScope;
-    for (Variable* parameter : parameters.data){
+    for (shared_ptr<Variable> parameter : parameters.data){
         if (!parameter->check()){
             return false;
         }
@@ -289,18 +288,18 @@ bool Function::check() {
     return true;
 }
 
-Function::Function(string type_name,string name,BlockStatement& functionBody){
+Function::Function(string type_name,string name,BlockStatement* functionBody){
     this->type_name = type_name;
     this->name = name;
-    this->functionBody = functionBody;
+    this->functionBody = shared_ptr(functionBody) ;
     this->classType = FUNCTION_CLASS;
 }
 
-Function::Function(string type_name, string name, VariableList& parameterList, BlockStatement& functionBody) {
+Function::Function(string type_name, string name, VariableList& parameterList, BlockStatement* functionBody) {
     this->type_name = type_name;
     this->name = name;
     this->parameters = parameterList;
-    this->functionBody = functionBody;
+    this->functionBody = shared_ptr(functionBody) ;
     this->classType = FUNCTION_CLASS;
 }
 
@@ -313,12 +312,12 @@ FunctionCall::FunctionCall(string name, ExpressionList& parameters) {
 }
 
 bool FunctionCall::check() {
-    FunctionSymbol *thisFunction = (FunctionSymbol *) globeScope->getVariable(this->name,FUNCTIONSYMBOL);
+    shared_ptr<FunctionSymbol> thisFunction = make_shared(globeScope->getVariable(this->name,FUNCTIONSYMBOL));
     if (thisFunction->parameterVariable.size() != this->parameters.data.size()){
         SystemError = "The number of parameters are not matched\n" ;
         return false;
     }
-    for (Expression* now : this->parameters.data){
+    for (shared_ptr<Expression> now : this->parameters.data){
         if (!now->check()) return false;
         if (now->type != IntType) {
             SystemError = "Symbol Error Should be in Int Value\n" ;
@@ -329,9 +328,9 @@ bool FunctionCall::check() {
     this->type = IntType;
 }
 
-InitVariable::InitVariable(string name, Expression& initializer, int command):Variable(name) {
+InitVariable::InitVariable(string name, Expression* initializer, int command):Variable(name) {
     this->command = command;
-    this->initializer = &initializer;
+    this->initializer = shared_ptr(initializer);
     this->classType = INITVARIABLE_CLASS;
 }
 
@@ -351,7 +350,7 @@ bool InitArrayVariable::check() {
         SystemError = "We can only initialize one dimensional array yet.\n";
         return false;
     }
-    for (Expression* now : position.data){
+    for (shared_ptr<Expression> now : position.data){
         if (!now->check()){
             return false;
         }
@@ -360,7 +359,7 @@ bool InitArrayVariable::check() {
             return false;
         }
     }
-    for (Expression* now : this->initializer.data){
+    for (shared_ptr<Expression> now : this->initializer.data){
         if (!now->check()) return false;
         if (now->type != IntType){
             SystemError = "The initializer should be INT type\n";
@@ -396,8 +395,8 @@ bool JumpStatement::check() {
     }
 }
 
-JumpStatement::JumpStatement(Expression &returnValue) {
-    this->returnValue = &returnValue;
+JumpStatement::JumpStatement(Expression *returnValue) {
+    this->returnValue = shared_ptr(returnValue);
 }
 
 JumpStatement::JumpStatement() {
@@ -428,11 +427,11 @@ LoopStatement::LoopStatement() {
     this->classType = LOOP_CLASS;
 }
 
-LoopStatement::LoopStatement(Expression &initializer, Expression &condition, Expression &iteration,Statement &loopBody) {
-    this->initializer = &initializer;
-    this->condition = &condition;
-    this->iteration = &iteration;
-	this->loopBody = &loopBody;
+LoopStatement::LoopStatement(Expression* initializer, Expression* condition, Expression* iteration,Statement* loopBody) {
+    this->initializer = shared_ptr(initializer);
+    this->condition = shared_ptr(condition);
+    this->iteration = shared_ptr(iteration);
+	this->loopBody = shared_ptr(loopBody);
     this->classType = LOOP_CLASS;
 }
 
@@ -455,9 +454,9 @@ bool LoopStatement::check()  {
     return true;
 }
 
-Type::Type(Declaration newDeclaration) {
-    this->declarationList = list<Declaration*>();
-    this->declarationList.push_front(&newDeclaration);
+Type::Type(Declaration* newDeclaration) {
+    this->declarationList = list<shared_ptr<Declaration>>();
+    this->declarationList.push_front(shared_ptr(newDeclaration));
     this->declare = true;
     this->classType = TYPE_CLASS;
 }
@@ -481,15 +480,15 @@ bool Type::check() {
         }
         currentScope = new Scope(currentScope);
         typeSymbol->memberScope = currentScope;
-        for (Declaration* declaration: declarationList){
+        for (shared_ptr<Declaration> declaration: declarationList){
             declaration->check();
-            for (Variable* variable : declaration->variableList.data){
+            for (shared_ptr<Variable> variable : declaration->variableList.data){
                 typeSymbol->addMember(variable->variableSymbol);
             }
         }
         currentScope = currentScope->prev();
     } else {
-        TypeSymbol* thisType =(TypeSymbol*) globeScope->getVariable(name,TYPESYMBOL);
+        shared_ptr<TypeSymbol> thisType = shared_ptr(globeScope->getVariable(name,TYPESYMBOL));
         if (thisType == nullptr){
             SystemError = "Undeclared Type:" + name + "\n";
             return false;
@@ -500,8 +499,8 @@ bool Type::check() {
     return true;
 }
 
-void Type::insert(Declaration newDeclaration) {
-    this->declarationList.push_front(&newDeclaration);
+void Type::insert(Declaration* newDeclaration) {
+    this->declarationList.push_front(shared_ptr(newDeclaration));
 }
 
 void Type::getName(string name) {
@@ -512,8 +511,8 @@ UnaryExpression::UnaryExpression() {
     this->classType = UNARY_CLASS;
 }
 
-UnaryExpression::UnaryExpression(Expression& child, int command) {
-    this->child = &child;
+UnaryExpression::UnaryExpression(Expression* child, int command) {
+    this->child = child;
     this->command = command;
     this->classType = UNARY_CLASS;
 }
@@ -559,12 +558,12 @@ bool Variable::check() {
 }
 
 
-void VariableList::insert(Variable now){
-    data.push_front(&now);
+void VariableList::insert(Variable* now){
+    data.push_front(shared_ptr(now));
 }
 
-VariableList::VariableList(Variable now) {
-    data = list<Variable*>();
-    data.push_front(&now);
+VariableList::VariableList(Variable* now) {
+    data = list<shared_ptr<Variable>>();
+    data.push_front(shared_ptr(now));
     this->classType = VARIABLELIST_CLASS;
 }

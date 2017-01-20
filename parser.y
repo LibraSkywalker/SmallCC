@@ -62,9 +62,9 @@
 
 program : event program {
     $$ = $2;
-    $$->insert(*$1);
+    $$->insert($1);
 }
-| event{Globe = $$ = new EventList(*$1);}
+| event{Globe = $$ = new EventList($1);}
 ;
 
 event : typeDeclare SEMI{$$ = $1;}
@@ -82,57 +82,57 @@ typeDeclare : STRUCT ID LC attributeDeclare RC{
 
 attributeDeclare : TYPE uninitializedVariables SEMI attributeDeclare{
     $$ = $4;
-    $$->insert(Declaration(*$1,*$2));
+    $$->insert(new Declaration($1,*$2));
 }
-|TYPE uninitializedVariables SEMI {$$ = new Type(Declaration(*$1,*$2));}
+|TYPE uninitializedVariables SEMI {$$ = new Type(new Declaration($1,*$2));}
 ;
 
-VariableDeclare : TYPE variables SEMI{$$ = new Declaration(*$1,*$2);}
-|   typeDeclare uninitializedVariables SEMI{$$ = new Declaration(*$1,*$2);}
+VariableDeclare : TYPE variables SEMI{$$ = new Declaration($1,*$2);}
+|   typeDeclare uninitializedVariables SEMI{$$ = new Declaration($1,*$2);}
 ;
 
 uninitializedVariables : ID COMMA uninitializedVariables{
     $$ = $3;
-    $$->insert(Variable(*$1));
+    $$->insert(new Variable($1));
 }
-| ID  {$$ = new VariableList(Variable(*$1));}
+| ID  {$$ = new VariableList(new Variable($1));}
 ;
 
 variables : variable COMMA variables {
     $$ = $3;
-    $$->insert(*$1);
+    $$->insert($1);
 }
-| variable {$$ = new VariableList(*$1);};
+| variable {$$ = new VariableList($1);};
 
 variable : ID {$$ = new Variable(*$1);}
 | array {$$ = $1;}
-| ID assign expression {$$ = new InitVariable(*$1,*$3,$2);}
+| ID assign expression {$$ = new InitVariable(*$1,$3,$2);}
 | array assign LC arguments RC {$$ = new InitArrayVariable(*$1,*$4,$2);}
 ;
 
 array : ID arrs{$$ = new ArrayVariable(*$1,*$2);}
 
 functionDeclare: TYPE ID LP parameters RP blockStatement{
-    $$ = new Function(*$1,*$2,*$4,*$6);
+    $$ = new Function(*$1,*$2,*$4,$6);
 }
 | TYPE ID LP RP blockStatement {
-	$$ = new Function(*$1,*$2,*$5);
+	$$ = new Function(*$1,*$2,$5);
 }
 ;
 
 parameters : TYPE ID COMMA parameters {
     $$ = $4;
-    $$->insert(Variable(*$1,*$2));
+    $$->insert(new Variable(*$1,*$2));
 }
-| TYPE ID {$$ = new VariableList(Variable(*$1,*$2));}
+| TYPE ID {$$ = new VariableList(new Variable(*$1,*$2));}
 ;
 
 
 Statements : Statement Statements {
     $$ = $2;
-    $$->insert(*$1);
+    $$->insert($1);
 }
-| Statement {$$ = new EventList(*$1);}
+| Statement {$$ = new EventList($1);}
 ;
 
 Statement :  loopStatement {$$ = $1;}
@@ -149,15 +149,15 @@ blockStatement : LC Statements RC {$$ = new BlockStatement(*$2);}
 
 jumpStatement : CONT SEMI {$$ = new JumpStatement(CONT_OP);}
 | BREAK SEMI {$$ = new JumpStatement(BREAK_OP);}
-| RETURN expression SEMI {$$ = new JumpStatement(*$2);}
+| RETURN expression SEMI {$$ = new JumpStatement($2);}
 ;
 
-branchStatement : IF expression THEN Statement ELSE Statement {$$ = new BranchStatement(*$2,*$4,*$6);}
-| IF expression THEN Statement {$$ = new BranchStatement(*$2,*$4);}
+branchStatement : IF LP expression RP Statement ELSE Statement {$$ = new BranchStatement($3,$5,$7);}
+| IF LP expression RP Statement {$$ = new BranchStatement($3,$5);}
 ;
 
 loopStatement : FOR LP expression COMMA expression COMMA expression RP Statement{
-        $$ = new LoopStatement(*$3,*$5,*$7,*$9);
+        $$ = new LoopStatement($3,$5,$7,$9);
 }
 ;
 
@@ -166,36 +166,36 @@ expression : INT {$$ = new Literal($1);}
 | ID {$$ = new Variable(*$1);}
 | LP expression RP {$$ = $2;}
 | ID DOT ID {$$ = new Attribute(*$1,*$3);}
-| ID arrs {$$ = new ArrayVariable(*$1,*$2);}
-| ID LP arguments RP {$$ = new FunctionCall(*$1,*$3);}
-| negative expression {$$ = new UnaryExpression(*$2,$1);}
-| selftune expression {$$ = new UnaryExpression(*$2,$1);}
-| expression calculate_ONE expression {$$ = new BinaryExpression(*$1,*$3,$2);}
-| expression calculate_TWO expression {$$ = new BinaryExpression(*$1,*$3,$2);}
-| expression shift expression {$$ = new BinaryExpression(*$1,*$3,$2);}
-| expression compare_ONE expression {$$ = new BinaryExpression(*$1,*$3,$2);}
-| expression compare_TWO expression {$$ = new BinaryExpression(*$1,*$3,$2);}
-| expression BAND expression {$$ = new BinaryExpression(*$1,*$3,BIT_AND_OP);}
-| expression BXOR expression {$$ = new BinaryExpression(*$1,*$3,BIT_XOR_OP);}
-| expression BOR expression {$$ = new BinaryExpression(*$1,*$3,BIT_OR_OP);}
-| expression AND expression {$$ = new BinaryExpression(*$1,*$3,AND_OP);}
-| expression OR expression {$$ = new BinaryExpression(*$1,*$3,OR_OP);}
-| expression assign expression {$$ = new BinaryExpression(*$1,*$3,$2);}
+| ID arrs {$$ = new ArrayVariable($1,$2);}
+| ID LP arguments RP {$$ = new FunctionCall(*$1,$3);}
+| negative expression {$$ = new UnaryExpression($2,$1);}
+| selftune expression {$$ = new UnaryExpression($2,$1);}
+| expression calculate_ONE expression {$$ = new BinaryExpression($1,$3,$2);}
+| expression calculate_TWO expression {$$ = new BinaryExpression($1,$3,$2);}
+| expression shift expression {$$ = new BinaryExpression($1,$3,$2);}
+| expression compare_ONE expression {$$ = new BinaryExpression($1,$3,$2);}
+| expression compare_TWO expression {$$ = new BinaryExpression($1,$3,$2);}
+| expression BAND expression {$$ = new BinaryExpression($1,$3,BIT_AND_OP);}
+| expression BXOR expression {$$ = new BinaryExpression($1,$3,BIT_XOR_OP);}
+| expression BOR expression {$$ = new BinaryExpression($1,$3,BIT_OR_OP);}
+| expression AND expression {$$ = new BinaryExpression($1,$3,AND_OP);}
+| expression OR expression {$$ = new BinaryExpression($1,$3,OR_OP);}
+| expression assign expression {$$ = new BinaryExpression($1,$3,$2);}
 ;
 
 
 arrs : LB expression RB arrs {
     $$ = $4;
-    $$->insert(*$2);
+    $$->insert($2);
 }
-    | LB expression RB  {$$ = new ExpressionList(*$2);}
+    | LB expression RB  {$$ = new ExpressionList($2);}
 ;
 
 arguments : expression COMMA arguments{
     $$ = $3;
-    $$->insert(*$1);
+    $$->insert($1);
 }
-| expression {$$ = new ExpressionList(*$1);}
+| expression {$$ = new ExpressionList($1);}
 ;
 
 shift : SHL {$$ = SHR_OP;}

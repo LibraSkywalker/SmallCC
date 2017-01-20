@@ -9,7 +9,7 @@ int main()
     extern int yyparse(void);  
     extern FILE *yyin;  
       
-    yyin=stdin;  
+    yyin= fopen("E:/OneDrive.Ideaprojects/SmallCC/test","r");
     extern int yyparse(void); 
     if(yyparse()){  
         fprintf(stderr,"Error! Error! Error!\n");  
