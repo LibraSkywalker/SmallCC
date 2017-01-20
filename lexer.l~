@@ -5,8 +5,6 @@
 	#include "parser.hpp"
 %}
 
-
-%option yylineno
 %option noyywrap
 
 OCT 0[1-7]([0-7])*

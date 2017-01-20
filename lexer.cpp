@@ -170,7 +170,20 @@ extern FILE *yyin, *yyout;
 #define EOB_ACT_END_OF_FILE 1
 #define EOB_ACT_LAST_MATCH 2
 
-    #define YY_LESS_LINENO(n)
+    /* Note: We specifically omit the test for yy_rule_can_match_eol because it requires
+     *       access to the local variable yy_act. Since yyless() is a macro, it would break
+     *       existing scanners that call yyless() from OUTSIDE yylex. 
+     *       One obvious solution it to make yy_act a global. I tried that, and saw
+     *       a 5% performance hit in a non-yylineno scanner, because yy_act is
+     *       normally declared as a register variable-- so it is not worth it.
+     */
+    #define  YY_LESS_LINENO(n) \
+            do { \
+                int yyl;\
+                for ( yyl = n; yyl < yyleng; ++yyl )\
+                    if ( yytext[yyl] == '\n' )\
+                        --yylineno;\
+            }while(0)
     
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
@@ -513,6 +526,13 @@ static yyconst flex_int16_t yy_chk[175] =
        96,   96,   96,   96
     } ;
 
+/* Table of booleans, true if rule could match eol. */
+static yyconst flex_int32_t yy_rule_can_match_eol[53] =
+    {   0,
+1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     };
+
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
 
@@ -533,7 +553,7 @@ char *yytext;
 	#include <cstdio>
 	#include <cstring>
 	#include "parser.hpp"
-#line 537 "lexer.cpp"
+#line 557 "lexer.cpp"
 
 #define INITIAL 0
 
@@ -720,9 +740,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 15 "lexer.l"
+#line 17 "lexer.l"
 
-#line 726 "lexer.cpp"
+#line 746 "lexer.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -794,6 +814,16 @@ yy_find_action:
 
 		YY_DO_BEFORE_ACTION;
 
+		if ( yy_act != YY_END_OF_BUFFER && yy_rule_can_match_eol[yy_act] )
+			{
+			int yyl;
+			for ( yyl = 0; yyl < yyleng; ++yyl )
+				if ( yytext[yyl] == '\n' )
+					   
+    yylineno++;
+;
+			}
+
 do_action:	/* This label is used only to access EOF actions. */
 
 		switch ( yy_act )
@@ -808,12 +838,12 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 16 "lexer.l"
+#line 18 "lexer.l"
 {}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 17 "lexer.l"
+#line 19 "lexer.l"
 {
 	int value ;
 	sscanf(yytext,"%o",&value);
@@ -823,7 +853,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 23 "lexer.l"
+#line 25 "lexer.l"
 {
 	int value;
 	sscanf(yytext,"%x",&value);
@@ -833,7 +863,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 29 "lexer.l"
+#line 31 "lexer.l"
 {
 	int value;
 	sscanf(yytext,"%d",&value);
@@ -843,7 +873,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 36 "lexer.l"
+#line 38 "lexer.l"
 {
 	yylval.string_value = new std::string(yytext);
 	return TYPE;
@@ -851,227 +881,227 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 40 "lexer.l"
+#line 42 "lexer.l"
 {return SEMI;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 41 "lexer.l"
+#line 43 "lexer.l"
 {return COMMA;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 42 "lexer.l"
+#line 44 "lexer.l"
 {return LP;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 43 "lexer.l"
+#line 45 "lexer.l"
 {return RP;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 44 "lexer.l"
+#line 46 "lexer.l"
 {return LB;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 45 "lexer.l"
+#line 47 "lexer.l"
 {return RB;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 46 "lexer.l"
+#line 48 "lexer.l"
 {return LC;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 47 "lexer.l"
+#line 49 "lexer.l"
 {return RC;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 48 "lexer.l"
+#line 50 "lexer.l"
 {return DOT;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 49 "lexer.l"
+#line 51 "lexer.l"
 {return SUB;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 50 "lexer.l"
+#line 52 "lexer.l"
 {return NOT;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 51 "lexer.l"
+#line 53 "lexer.l"
 {return BNOT;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 52 "lexer.l"
+#line 54 "lexer.l"
 {return INC;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 53 "lexer.l"
+#line 55 "lexer.l"
 {return DEC;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 54 "lexer.l"
+#line 56 "lexer.l"
 {return MUL;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 55 "lexer.l"
+#line 57 "lexer.l"
 {return DIV;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 56 "lexer.l"
+#line 58 "lexer.l"
 {return MOD;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 57 "lexer.l"
+#line 59 "lexer.l"
 {return ADD;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 58 "lexer.l"
+#line 60 "lexer.l"
 {return SHL;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 59 "lexer.l"
+#line 61 "lexer.l"
 {return SHR;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 60 "lexer.l"
+#line 62 "lexer.l"
 {return SGT;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 61 "lexer.l"
+#line 63 "lexer.l"
 {return SGE;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 62 "lexer.l"
+#line 64 "lexer.l"
 {return SLT;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 63 "lexer.l"
+#line 65 "lexer.l"
 {return SEQ;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 64 "lexer.l"
+#line 66 "lexer.l"
 {return SNE;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 65 "lexer.l"
+#line 67 "lexer.l"
 {return BAND;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 66 "lexer.l"
+#line 68 "lexer.l"
 {return BXOR;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 67 "lexer.l"
+#line 69 "lexer.l"
 {return BOR;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 68 "lexer.l"
+#line 70 "lexer.l"
 {return AND;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 69 "lexer.l"
+#line 71 "lexer.l"
 {return OR;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 70 "lexer.l"
+#line 72 "lexer.l"
 {return ASSIGN;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 71 "lexer.l"
+#line 73 "lexer.l"
 {return PLUSASSIGN;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 72 "lexer.l"
+#line 74 "lexer.l"
 {return MINUSASSIGN;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 73 "lexer.l"
+#line 75 "lexer.l"
 {return MULTIPLYASSIGN;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 74 "lexer.l"
+#line 76 "lexer.l"
 {return DIVIDEASSIGN;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 75 "lexer.l"
+#line 77 "lexer.l"
 {printf("struct");return STRUCT;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 76 "lexer.l"
+#line 78 "lexer.l"
 {return RETURN;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 77 "lexer.l"
+#line 79 "lexer.l"
 {return IF;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 78 "lexer.l"
+#line 80 "lexer.l"
 {return ELSE;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 79 "lexer.l"
+#line 81 "lexer.l"
 {return BREAK;}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 80 "lexer.l"
+#line 82 "lexer.l"
 {return CONT;}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 81 "lexer.l"
+#line 83 "lexer.l"
 {return FOR;}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 82 "lexer.l"
+#line 84 "lexer.l"
 {return READ;}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 83 "lexer.l"
+#line 85 "lexer.l"
 {return WRITE;}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 85 "lexer.l"
+#line 87 "lexer.l"
 {
 	yylval.string_value = new std::string(yytext);
 	return ID;
@@ -1079,7 +1109,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 90 "lexer.l"
+#line 92 "lexer.l"
 {  
     std::cout << "lexical error" << std::endl;  
     exit(1);  
@@ -1087,10 +1117,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 95 "lexer.l"
+#line 97 "lexer.l"
 ECHO;
 	YY_BREAK
-#line 1094 "lexer.cpp"
+#line 1124 "lexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1451,6 +1481,10 @@ static int yy_get_next_buffer (void)
 
 	*--yy_cp = (char) c;
 
+    if ( c == '\n' ){
+        --yylineno;
+    }
+
 	(yytext_ptr) = yy_bp;
 	(yy_hold_char) = *yy_cp;
 	(yy_c_buf_p) = yy_cp;
@@ -1525,6 +1559,11 @@ static int yy_get_next_buffer (void)
 	c = *(unsigned char *) (yy_c_buf_p);	/* cast for 8-bit char's */
 	*(yy_c_buf_p) = '\0';	/* preserve yytext */
 	(yy_hold_char) = *++(yy_c_buf_p);
+
+	if ( c == '\n' )
+		   
+    yylineno++;
+;
 
 	return c;
 }
@@ -1996,6 +2035,9 @@ static int yy_init_globals (void)
      * This function is called from yylex_destroy(), so don't allocate here.
      */
 
+    /* We do not touch yylineno unless the option is enabled. */
+    yylineno =  1;
+    
     (yy_buffer_stack) = 0;
     (yy_buffer_stack_top) = 0;
     (yy_buffer_stack_max) = 0;
@@ -2088,7 +2130,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 95 "lexer.l"
+#line 97 "lexer.l"
 
 
 

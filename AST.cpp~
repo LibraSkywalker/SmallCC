@@ -158,7 +158,7 @@ bool BranchStatement::check() {
     if (!this->condition->check()){
         return false;
     }
-    if (this->condition->type != IntType){
+    if (!this->condition->type == IntType){
         SystemError = "Should be Int type in branch condition!";
         return false;
     }

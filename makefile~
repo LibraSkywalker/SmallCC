@@ -1,7 +1,7 @@
 AST:
 	flex -o lexer.cpp lexer.l
 	bison -o parser.cpp -d parser.y
-	g++ -std=c++11 lexer.cpp parser.cpp semanticAnalyzer.cpp main.cpp AST.cpp  -o try
+	g++ -std=c++11 lexer.cpp parser.cpp main.cpp AST.cpp semanticAnalyzer.cpp -o try
 Test_AST: 
 	g++ AST.cpp test.cpp
 clean:

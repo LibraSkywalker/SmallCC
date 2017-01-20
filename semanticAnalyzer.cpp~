@@ -50,10 +50,14 @@ Symbol* Scope::putVariable(string variable,int SymbolType) {
     if (SymbolType == TYPESYMBOL){
         dict[variable] = new TypeSymbol(counter,SymbolType);
     } else if (SymbolType == VARIABLESYMBOL){
+	 cout << "do" << endl;
         dict[variable] = new VariableSymbol(counter,SymbolType);
+	cout << "did" << endl;
     } else {
         dict[variable] = new FunctionSymbol(counter,SymbolType);
     }
+	cout << "done" << endl;
+
     return dict[variable];
 }
 
