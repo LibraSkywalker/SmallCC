@@ -1,9 +1,9 @@
 #include "AST.h"
-#include "ConstHeader.h"
-
 bool ArrayVariable::check() {
     //array call
-    if (this->variableSymbol == nullptr){
+    this->forDeclare = this->variableSymbol != nullptr;
+    if (!this->forDeclare){
+
         this->variableSymbol = std::static_pointer_cast<VariableSymbol>(currentScope->getVariable(this->name,VARIABLESYMBOL)) ;
         if (this->variableSymbol == nullptr){
             SystemError = "Undeclared Variable: " + this->name + "\n";
@@ -38,9 +38,50 @@ bool ArrayVariable::check() {
     return true;
 }
 
+void ArrayVariable::generate() {
+    if (this->forDeclare){
+        biInstruction("li", ARRAYTEMP_REGISTER, 1);
+        for (shared_ptr<Expression> now : this->position.data) {
+            now->generate();
+            loadFromVirtualRegister(RSRC1_REGISTER, now->virtualRegister);
+            allocateInt();
+            saveToAddress(RSRC1_REGISTER, RETURNVALUE_REGISTER);
+            trInstruction("mul", ARRAYTEMP_REGISTER, ARRAYTEMP_REGISTER, RSRC1_REGISTER);
+        }
+        allocateMemoryByReg(ARRAYTEMP_REGISTER);
+        saveToVirtualRegister(RETURNVALUE_REGISTER,this->variableSymbol->ID);
+    } else {
+        virtualRegister = ++counter;
+        loadFromVirtualRegister(TEMP_REGISTER,this->variableSymbol->ID);
+        tiInstruction("sub",TEMP_REGISTER,TEMP_REGISTER,(int)this->position.data.size() * 4);
+        biInstruction("li", ARRAYTEMP_REGISTER, 0);
+        for (shared_ptr<Expression> now : this->position.data) {
+            loadFromAddress(RDEST_REGISTER,TEMP_REGISTER);
+            trInstruction("mul",ARRAYTEMP_REGISTER,ARRAYTEMP_REGISTER,RDEST_REGISTER);
+            now->generate();
+            loadFromVirtualRegister(RDEST_REGISTER,now->virtualRegister);
+            trInstruction("add",ARRAYTEMP_REGISTER,ARRAYTEMP_REGISTER,RDEST_REGISTER);
+        }
+        trInstruction("add",ARRAYTEMP_REGISTER,ARRAYTEMP_REGISTER,TEMP_REGISTER);
+        brInstruction("move",TEMPADDRESS_REGISTER,ARRAYTEMP_REGISTER);
+        // load address for possible adjust
+        loadFromAddress(RDEST_REGISTER,ARRAYTEMP_REGISTER);
+        saveToVirtualRegister(RDEST_REGISTER,virtualRegister);
+    }
+}
+
 ArrayVariable::ArrayVariable(string name, ExpressionList& position):Variable(name) {
     this->position = position;
     this->classType = ARRAYVARIABLE_CLASS;
+}
+
+void Attribute::generate() {
+    virtualRegister = ++counter;
+    loadFromVirtualRegister(RDEST_REGISTER,this->variableSymbol->ID);
+    trInstruction("add",TEMPADDRESS_REGISTER,RDEST_REGISTER,variableSymbol->inTypeID());
+    //load address for possible adjust
+    loadFromAddress(RDEST_REGISTER,RDEST_REGISTER,this->variableSymbol->inTypeID());
+    saveToVirtualRegister(RDEST_REGISTER,virtualRegister);
 }
 
 Attribute::Attribute() {
@@ -67,6 +108,7 @@ bool Attribute::check() {
         SystemError = "Cannot find attribute from this struct.";
         return false;
     }
+    this->variableSymbol = thisVariable;
     this->type = IntType;
     this->left = true;
     return true;
@@ -81,17 +123,21 @@ bool BinaryExpression::check() {
         return false;
     }
     if (!this->Left->left){
-        SystemError = "Should be left value during assign";
         switch (this->command) {
             case ASSIGN_OP :
+                SystemError = "Should be left value during assign";
                 return false;
             case DIVIDE_ASSIGN_OP:
+                SystemError = "Should be left value during assign";
                 return false;
             case MINUS_ASSIGN_OP:
+                SystemError = "Should be left value during assign";
                 return false;
             case PLUS_ASSIGN_OP:
+                SystemError = "Should be left value during assign";
                 return false;
             case MULTIPLY_ASSIGN_OP:
+                SystemError = "Should be left value during assign";
                 return false;
             default:;
         }
@@ -106,6 +152,60 @@ bool BinaryExpression::check() {
     this->type = this->Left->type;
     this->left = false;
     return true;
+}
+
+void BinaryExpression::generate() {
+    int virtualRegister = ++counter;
+    this->Right->generate();
+    this->Left->generate();
+
+    loadFromVirtualRegister(RSRC1_REGISTER, Left->virtualRegister);
+    loadFromVirtualRegister(RSRC2_REGISTER, Right->virtualRegister);
+
+    switch (command){
+        case ADD_OP: trInstruction("add",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case SUB_OP: trInstruction("sub",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case MUL_OP: trInstruction("mul",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case DIV_OP: trInstruction("div",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case MOD_OP: trInstruction("rem",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case SGT_OP: trInstruction("sgt",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case SGE_OP: trInstruction("sge",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case SLE_OP: trInstruction("sle",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case SLT_OP: trInstruction("slt",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case SEQ_OP: trInstruction("seq",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case SNE_OP: trInstruction("sne",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case SHL_OP: trInstruction("sll",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case SHR_OP: trInstruction("srl",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case BIT_AND_OP: trInstruction("and",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case BIT_OR_OP: trInstruction("or",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case BIT_XOR_OP: trInstruction("xor",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case AND_OP: trInstruction("and",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case OR_OP: trInstruction("or",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case ASSIGN_OP: {
+            brInstruction("move $%d $%d",RDEST_REGISTER,RSRC2_REGISTER);
+            assignmentSave();
+        }
+        case PLUS_ASSIGN_OP:{
+            trInstruction("add",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            assignmentSave();
+        }
+        case MINUS_ASSIGN_OP:{
+            trInstruction("sub",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            assignmentSave();
+        }
+        case MULTIPLY_ASSIGN_OP:{
+            trInstruction("mul",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            assignmentSave();
+        }
+        case DIVIDE_ASSIGN_OP: {
+            trInstruction("div",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            assignmentSave();
+        }
+        default:
+            printf("error!\n");
+    }
+    saveToVirtualRegister(RDEST_REGISTER,virtualRegister);
+
 }
 
 BinaryExpression::BinaryExpression(Expression* Left, Expression* Right, int command) {
@@ -129,11 +229,16 @@ BlockStatement::BlockStatement(EventList& events) {
 }
 
 bool BlockStatement::check() {
-	if (events == nullptr) return true;
     for (shared_ptr<Statement> now: this->events.data){
         if (!now->check()) return false;
     }
     return true;
+}
+
+void BlockStatement::generate() {
+    for (shared_ptr<Statement> now: this->events.data){
+        now->generate();
+    }
 }
 
 BranchStatement::BranchStatement() {
@@ -164,19 +269,40 @@ bool BranchStatement::check() {
         return false;
     }
     leftScope = currentScope = make_shared<Scope>(currentScope);
-    if (!this->AcceptStatement){
+    if (!this->AcceptStatement->check()){
         return false;
     }
+    currentScope = currentScope->prev();
 	//TODO: nullptr
-	if (this->hasDenyStatement){	
-    	currentScope = currentScope->prev();
+	if (this->hasDenyStatement){
     	rightScope = currentScope =make_shared<Scope>(currentScope);
-    	if (!this->DenyStatement){
+    	if (!this->DenyStatement->check()){
         	return false;
     	}
     	currentScope = currentScope->prev();
 	}
     return true;
+}
+
+void BranchStatement::generate() {
+    string labelTemplate = currentLabel;
+
+    this->condition->generate();
+    loadFromVirtualRegister(RDEST_REGISTER,this->condition->virtualRegister);
+    branchInstruction("bne",RDEST_REGISTER,labelTemplate + "_branchTaken");
+
+    if (hasDenyStatement){
+        this->DenyStatement->generate();
+    }
+    gotoInstruction(labelTemplate + "_afterBranch");
+
+    currentLabel = labelTemplate + "_branchTaken";
+    tagLabel(currentLabel);
+
+    this->AcceptStatement->generate();
+
+    currentLabel = labelTemplate + "_afterBranch";
+    tagLabel(currentLabel);
 }
 
 Declaration::Declaration(Type* type, VariableList& variableList) {
@@ -192,6 +318,19 @@ Declaration::Declaration(string type_name,VariableList& variableList){
     this->classType = DECLARE_CLASS;
 }
 
+void Declaration::generate() {
+    if (this->type_name != ""){
+        for (shared_ptr<Variable> now : this->variableList.data) {
+            now->generate();
+        }
+    } else {
+        for (shared_ptr<Variable> now : this->variableList.data){
+            allocateMemory(now->type->size());
+            saveToVirtualRegister(RETURNVALUE_REGISTER,now->variableSymbol->ID);
+        }
+    }
+}
+
 bool Declaration::check() {
     if (this->type_name != ""){
         for (shared_ptr<Variable> now : this->variableList.data){
@@ -202,7 +341,7 @@ bool Declaration::check() {
             }
             nowSymbol->setType(IntType);
             now->variableSymbol = nowSymbol;
-            now->check();
+            if (!now->check()) return false;
         }
     } else {
         if (!this->type->check()) return false;
@@ -215,7 +354,7 @@ bool Declaration::check() {
             }
             nowSymbol->setType(thisType);
             now->variableSymbol = nowSymbol;
-            now->check();
+            if (!now->check()) return false;
         }
     }
 
@@ -245,10 +384,33 @@ bool EventList::check() {
     return true;
 }
 
+void EventList::generate() {
+    if (currentScope == globeScope){
+        tagLabel("main");
+
+        for (shared_ptr<Statement> event : this->data){
+            if (event->classType == DECLARE_CLASS)
+                event->generate();
+        }
+
+        jumpInstruction("main");
+        exitInstruction();
+
+        for (shared_ptr<Statement> event : this->data){
+            if (event->classType == FUNCTION_CLASS)
+                event->generate();
+        }
+
+    } else {
+        for (shared_ptr<Statement> event : this->data) {
+            event->generate();
+        }
+    }
+}
+
 ExpressionList::ExpressionList() {
     this->classType = EXPRESSIONLIST_CLASS;
 }
-
 
 ExpressionList::ExpressionList(Expression* now) {
     data = list<shared_ptr<Expression>>();
@@ -282,14 +444,25 @@ bool Function::check() {
     }
     currentScope = make_shared<Scope>(currentScope);
 
+
     if (!this->functionBody->check()){
         return false;
     }
 
-    currentScope = currentScope->prev();
-    currentScope = currentScope->prev();
+    this->bodyScope = currentScope;
+    currentScope = currentScope->prev()->prev();
     this->functionSymbol = thisFunction;
     return true;
+}
+
+void Function::generate() {
+    currentLabel = "func_" + this->name;
+    tagLabel(currentLabel);
+    currentScope = bodyScope;
+
+    this->functionBody->generate();
+
+    currentScope = currentScope->prev()->prev();
 }
 
 Function::Function(string type_name,string name,BlockStatement* functionBody){
@@ -315,6 +488,52 @@ FunctionCall::FunctionCall(string name, ExpressionList& parameters) {
     this->classType = FUNCTIONCALL_CLASS;
 }
 
+void FunctionCall::generate() {
+    virtualRegister = ++counter;
+	
+    for (shared_ptr<Expression> now : this->parameters.data){
+        now->generate();
+    }
+	if (this->name == "read"){
+		biInstruction("li",RETURNADDRESS_REGISTER,5);
+		printf("syscall\n");
+	}
+	if (this->name == "write"){
+		for (shared_ptr<Expression> now : this->parameters.data){
+			loadFromVirtualRegister(RSRC1_REGISTER,now->virtualRegister);
+        	brInstruction("move",4,RSRC1_REGISTER);
+		}
+		biInstruction("li",RETURNADDRESS_REGISTER,1);
+		printf("syscall\n");
+		
+	} else {
+    	int space = (int)(this->functionSymbol->parameterVariable.size()) + 3;
+
+    	//save return address
+   		saveToAddress(RETURNADDRESS_REGISTER,STACKPOINTER_REGISTER);
+    	//push stack
+   		tiInstruction("subu",STACKPOINTER_REGISTER,STACKPOINTER_REGISTER,space * 4);
+
+    	//save params
+    	int num = 0;
+    	for (shared_ptr<Expression> now : this->parameters){
+        	loadFromVirtualRegister(RSRC1_REGISTER,now->virtualRegister);
+        	saveToAddress(RSRC1_REGISTER,STACKPOINTER_REGISTER,++num);
+    	}
+	
+    	//jump
+    	jumpInstruction(this->name);
+
+    	//pop stack
+    	tiInstruction("addu",STACKPOINTER_REGISTER,STACKPOINTER_REGISTER,space * 4);
+
+    	//load return address
+    	loadFromAddress(RETURNADDRESS_REGISTER,STACKPOINTER_REGISTER);
+    	//load return address
+	}
+    saveToVirtualRegister(RETURNVALUE_REGISTER,virtualRegister);
+}
+
 bool FunctionCall::check() {
     shared_ptr<FunctionSymbol> thisFunction = static_pointer_cast<FunctionSymbol>(globeScope->getVariable(this->name,FUNCTIONSYMBOL));
     if (thisFunction->parameterVariable.size() != this->parameters.data.size()){
@@ -328,8 +547,10 @@ bool FunctionCall::check() {
             return false;
         }
     }
+    this->functionSymbol = thisFunction;
     this->left = false;
     this->type = IntType;
+    return true;
 }
 
 InitVariable::InitVariable(string name, Expression* initializer, int command):Variable(name) {
@@ -338,7 +559,14 @@ InitVariable::InitVariable(string name, Expression* initializer, int command):Va
     this->classType = INITVARIABLE_CLASS;
 }
 
+void InitVariable::generate() {
+    initializer->generate();
+    loadFromVirtualRegister(RSRC1_REGISTER,initializer->virtualRegister);
+    saveToVirtualRegister(RSRC1_REGISTER,variableSymbol->ID);
+}
+
 bool InitVariable::check() {
+    this->forDeclare = true;
     if (!initializer->check()){
         return false;
     }
@@ -346,9 +574,11 @@ bool InitVariable::check() {
         SystemError = "The initializer should be INT type\n";
         return false;
     }
+    return true;
 }
 
 bool InitArrayVariable::check() {
+    this->forDeclare = true;
     this->variableSymbol->setLevel((int)this->position.data.size());
     if (this->variableSymbol->getLevel() > 1){
         SystemError = "We can only initialize one dimensional array yet.\n";
@@ -370,8 +600,28 @@ bool InitArrayVariable::check() {
             return false;
         }
     }
+    return true;
 }
 
+void InitArrayVariable::generate() {
+    biInstruction("li", ARRAYTEMP_REGISTER, 1);
+    for (shared_ptr<Expression> now : this->position.data) {
+        now->generate();
+        loadFromVirtualRegister(RSRC1_REGISTER, now->virtualRegister);
+        allocateInt();
+        saveToAddress(RSRC1_REGISTER, RETURNVALUE_REGISTER);
+        trInstruction("mul", ARRAYTEMP_REGISTER, ARRAYTEMP_REGISTER, RSRC1_REGISTER);
+    }
+    allocateMemoryByReg(ARRAYTEMP_REGISTER);
+    saveToVirtualRegister(RETURNVALUE_REGISTER,this->variableSymbol->ID);
+    brInstruction("move",ARRAYTEMP_REGISTER,RETURNVALUE_REGISTER);
+    for (shared_ptr<Expression> now : this->initializer.data){
+        now->generate();
+        loadFromVirtualRegister(RDEST_REGISTER,virtualRegister);
+        saveToAddress(RDEST_REGISTER,ARRAYTEMP_REGISTER);
+        tiInstruction("add",ARRAYTEMP_REGISTER,ARRAYTEMP_REGISTER,4);
+    }
+}
 
 InitArrayVariable::InitArrayVariable(ArrayVariable& preview,ExpressionList& initializer,int command) {
 	this->position = preview.position;
@@ -397,7 +647,27 @@ bool JumpStatement::check() {
             }
         }
     }
+    return true;
 }
+
+void JumpStatement::generate() {
+    if (this->returnValue != nullptr){
+        this->returnValue->generate();
+        loadFromVirtualRegister(RETURNVALUE_REGISTER,this->returnValue->virtualRegister);
+        urInstruction("jr",RETURNADDRESS_REGISTER);
+    } else {
+        int endOfLoop = (int) currentLabel.find_last_of("Loop");
+        if (endOfLoop < 4) cout << "Weirld! the length of label should not be less than 4";
+        string templateLabel = currentLabel.substr(0,(unsigned)(endOfLoop - 4));
+        if (this->command == BREAK_OP){
+            gotoInstruction(templateLabel + "_AfterLoop");
+        } else {
+            gotoInstruction(templateLabel + "_LoopIter");
+        }
+        //TODO break & continue
+    }
+}
+
 
 JumpStatement::JumpStatement(Expression *returnValue) {
     this->returnValue = shared_ptr<Expression>(returnValue);
@@ -423,6 +693,12 @@ bool Literal::check() {
     return true;
 }
 
+void Literal::generate() {
+    virtualRegister = ++counter;
+    biInstruction("li $%d %d",RDEST_REGISTER,data);
+    saveToVirtualRegister(RDEST_REGISTER,virtualRegister);
+}
+
 void Literal::print(){
 	printf("Literal: %d",this->data);
 }
@@ -437,6 +713,31 @@ LoopStatement::LoopStatement(Expression* initializer, Expression* condition, Exp
     this->iteration = shared_ptr<Expression>(iteration);
 	this->loopBody = shared_ptr<Statement>(loopBody);
     this->classType = LOOP_CLASS;
+}
+
+void LoopStatement::generate() {
+    this->initializer->generate();
+
+    string labelTemplate = currentLabel;
+
+    currentLabel = labelTemplate + "_LoopCondtion";
+    tagLabel(currentLabel);
+    this->condition->generate();
+    loadFromVirtualRegister(RDEST_REGISTER,this->condition->virtualRegister);
+    branchInstruction("beq",RDEST_REGISTER,labelTemplate + "_AfterLoop");
+
+
+    currentLabel = labelTemplate + "_LoopBody";
+    tagLabel(currentLabel);
+    this->loopBody->generate();
+
+    currentLabel = labelTemplate + "_LoopIter";
+    tagLabel(currentLabel);
+    this->iteration->generate();
+    gotoInstruction(labelTemplate + "_LoopCondtion");
+
+    currentLabel = labelTemplate + "_AfterLoop";
+    tagLabel(currentLabel);
 }
 
 bool LoopStatement::check()  {
@@ -503,6 +804,8 @@ bool Type::check() {
     return true;
 }
 
+void Type::generate() {}
+
 void Type::insert(Declaration* newDeclaration) {
     this->declarationList.push_front(shared_ptr<Declaration>(newDeclaration));
 }
@@ -536,6 +839,29 @@ bool UnaryExpression::check() {
     return true;
 }
 
+void UnaryExpression::generate() {
+    child->generate();
+    virtualRegister = ++counter;
+
+    loadFromVirtualRegister(RSRC1_REGISTER, child->virtualRegister);
+
+    switch (command){
+        case BIT_NOT_OP: brInstruction("not",RDEST_REGISTER,RSRC1_REGISTER);
+        case NOT_OP: brInstruction("nor",RDEST_REGISTER,RSRC1_REGISTER);
+        case NEG_OP: brInstruction("neg",RDEST_REGISTER,RSRC1_REGISTER);
+        case INC_OP:
+            tiInstruction("add",RDEST_REGISTER,RSRC1_REGISTER,1);
+            assignmentSave();
+
+        case DEC_OP:
+            tiInstruction("sub",RDEST_REGISTER,RSRC1_REGISTER,1);
+            assignmentSave();
+        default:
+            printf("error!\n");
+    }
+    saveToVirtualRegister(RDEST_REGISTER,virtualRegister);
+}
+
 Variable::Variable(string name){
     this->name = name;
     this->classType = VARIABLE_CLASS;
@@ -548,15 +874,37 @@ Variable::Variable(string type_name,string name){
     this->classType = VARIABLE_CLASS;
 }
 
+void Variable::generate() {
+    virtualRegister = ++counter;
+    if (!this->forDeclare){
+        //is parameter
+        if (this->variableSymbol->parameterID() > 0){
+            loadFromAddress(RDEST_REGISTER,STACKPOINTER_REGISTER,this->variableSymbol->parameterID());
+            // load address for possible adjust
+            tiInstruction("add",TEMPADDRESS_REGISTER,STACKPOINTER_REGISTER,this->variableSymbol->parameterID() * 4);
+        } else {
+            loadAddressFromVirtualRegister(TEMPADDRESS_REGISTER, this->variableSymbol->ID);
+            // load address for possible adjust
+            loadFromVirtualRegister(RDEST_REGISTER, this->variableSymbol->ID);
+        }
+        saveToVirtualRegister(RDEST_REGISTER, virtualRegister);
+    }
+}
+
 bool Variable::check() {
-    // variable ask
-    if (this->variableSymbol == nullptr){
+    this->forDeclare = (this->variableSymbol != nullptr);
+    if (!this->forDeclare){
         this->variableSymbol = static_pointer_cast<VariableSymbol>(currentScope->getVariable(this->name,VARIABLESYMBOL));
         if (this->variableSymbol == nullptr){
             SystemError = "Undeclared Variable: " + this->name + "\n";
             return false;
         }
+        if (this->variableSymbol->getLevel() > 0 ){
+            SystemError = "Cannot call array value by its pointer.";
+            return false;
+        }
     }
+    this->type = this->variableSymbol->type;
     this->left = true;
     return true;
 }

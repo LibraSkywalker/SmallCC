@@ -490,33 +490,47 @@ FunctionCall::FunctionCall(string name, ExpressionList& parameters) {
 
 void FunctionCall::generate() {
     virtualRegister = ++counter;
-    for (shared_ptr<Expression> now : this->parameters){
+	
+    for (shared_ptr<Expression> now : this->parameters.data){
         now->generate();
     }
-    int space = (int)(this->functionSymbol->parameterVariable.size()) + 3;
+	if (this->name == "read"){
+		biInstruction("li",RETURNADDRESS_REGISTER,5);
+		printf("syscall\n");
+	}
+	if (this->name == "write"){
+		for (shared_ptr<Expression> now : this->parameters.data){
+			loadFromVirtualRegister(RSRC1_REGISTER,now->virtualRegister);
+        	brInstruction("move",4,RSRC1_REGISTER);
+		}
+		biInstruction("li",RETURNADDRESS_REGISTER,1);
+		printf("syscall\n");
+		
+	} else {
+    	int space = (int)(this->functionSymbol->parameterVariable.size()) + 3;
 
-    //save return address
-    saveToAddress(RETURNADDRESS_REGISTER,STACKPOINTER_REGISTER);
-    //push stack
-    tiInstruction("subu",STACKPOINTER_REGISTER,STACKPOINTER_REGISTER,space * 4);
+    	//save return address
+   		saveToAddress(RETURNADDRESS_REGISTER,STACKPOINTER_REGISTER);
+    	//push stack
+   		tiInstruction("subu",STACKPOINTER_REGISTER,STACKPOINTER_REGISTER,space * 4);
 
-    //save params
-    int num = 0;
-    for (shared_ptr<Expression> now : this->parameters){
-        loadFromVirtualRegister(RSRC1_REGISTER,now->virtualRegister);
-        saveToAddress(RSRC1_REGISTER,STACKPOINTER_REGISTER,++num);
-    }
+    	//save params
+    	int num = 0;
+    	for (shared_ptr<Expression> now : this->parameters.data){
+        	loadFromVirtualRegister(RSRC1_REGISTER,now->virtualRegister);
+        	saveToAddress(RSRC1_REGISTER,STACKPOINTER_REGISTER,++num);
+    	}
+	
+    	//jump
+    	jumpInstruction(this->name);
 
-    //jump
-    jumpInstruction(this->name);
+    	//pop stack
+    	tiInstruction("addu",STACKPOINTER_REGISTER,STACKPOINTER_REGISTER,space * 4);
 
-    //pop stack
-    tiInstruction("addu",STACKPOINTER_REGISTER,STACKPOINTER_REGISTER,space * 4);
-
-    //load return address
-    loadFromAddress(RETURNADDRESS_REGISTER,STACKPOINTER_REGISTER);
-    //load return address
-
+    	//load return address
+    	loadFromAddress(RETURNADDRESS_REGISTER,STACKPOINTER_REGISTER);
+    	//load return address
+	}
     saveToVirtualRegister(RETURNVALUE_REGISTER,virtualRegister);
 }
 

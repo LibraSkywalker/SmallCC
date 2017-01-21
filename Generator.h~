@@ -2,15 +2,15 @@
 // Created by Bill on 2017/1/21.
 //
 
-#ifndef SMALLCC_GENERATOR_H
-#define SMALLCC_GENERATOR_H
-
-
 #include <string>
 #include "ConstHeader.h"
 #include <cstdio>
 #include <iostream>
 using namespace std;
+
+#ifndef SMALLCC_GENERATOR_H
+#define SMALLCC_GENERATOR_H
+
 
 void allocateMemory(int size){
     printf("li $4 %d\n",size * 8);

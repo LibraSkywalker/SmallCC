@@ -9,3 +9,4 @@ clean:
 	rm -f lexer.cpp
 	rm -f parser.cpp
 	rm -f parser.hpp
+	rm -f error

@@ -13,8 +13,8 @@ using namespace std;
 
 class Node{
 protected:
-public:
     int classType;
+public:
     virtual void print(){
         cout << "Type: " << classType << endl;
     }

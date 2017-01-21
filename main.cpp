@@ -1,7 +1,6 @@
 #include <iostream>
 #include "AST.h"
 #include "semanticAnalyzer.h"
-#include "MIPS.h"
 using namespace std;
 EventList* Globe;
 

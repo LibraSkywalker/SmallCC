@@ -1,6 +1,7 @@
 #include <iostream>
 #include "AST.h"
 #include "semanticAnalyzer.h"
+#include "MIPS.h"
 using namespace std;
 EventList* Globe;
 
@@ -10,13 +11,21 @@ void semanticAnalyze(){
         IntType = std::static_pointer_cast<TypeSymbol>(globeScope->putVariable("int",TYPESYMBOL));
 		ReadFunc = std::static_pointer_cast<FunctionSymbol>(globeScope->putVariable("read",FUNCTIONSYMBOL));
 		WriteFunc = std::static_pointer_cast<FunctionSymbol>(globeScope->putVariable("write",FUNCTIONSYMBOL));
-		ReadFunc 
+		ReadFunc->addParameter(make_shared<VariableSymbol>(IntType));
+		WriteFunc->addParameter(make_shared<VariableSymbol>(IntType));
         if (!Globe->check()){
             cout << "Semantic check failed\n" + SystemError << endl;
         } else {
             cout << "Semantic check succeed\n" << endl;
         }
     }
+}
+
+void mipsCodeGenerate(){
+    cout <<".data"<< endl << endl;
+    cout <<"VReg: .space 4096" << endl;
+    cout <<".text"<< endl << endl;
+    Globe->generate();
 }
 
 int main()  
@@ -26,13 +35,13 @@ int main()
       
     yyin= fopen("test","r");
     extern int yyparse(void); 
-    if(yyparse()){  
-        fprintf(stderr,"Error! Error! Error!\n");  
+    if(yyparse()){
         return 1;
     }
 
 	semanticAnalyze();
-    
+
+    mipsCodeGenerate();
 
     return 0;
 }  

@@ -1,5 +1,6 @@
 #ifndef SEMANTICANALYZER_H_INCLUDED
 #define SEMANTICANALYZER_H_INCLUDED
+
 using namespace std;
 #include<map>
 #include <memory>
