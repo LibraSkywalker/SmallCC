@@ -44,7 +44,7 @@ shared_ptr<Scope> Scope::prev() {
 }
 
 shared_ptr<Symbol> Scope::putVariable(string variable,int SymbolType) {
-	cout << "put " + variable + "" << endl;
+	//cout << "put " + variable + "" << endl;
     if (contains(variable)) return nullptr;
     ++counter;
     if (SymbolType == TYPESYMBOL){
@@ -87,13 +87,19 @@ bool Scope::inloop() {
     return this->prev()->inloop();
 }
 
-void VariableSymbol::setType(shared_ptr<TypeSymbol>  type) {
+void VariableSymbol::setType(shared_ptr<TypeSymbol> type) {
     this->type = type;
 }
 
 TypeSymbol::TypeSymbol(int ID, int SymbolType):Symbol(ID,SymbolType) {}
 
-VariableSymbol::VariableSymbol(int ID, int SymbolType):Symbol(ID,SymbolType) {}
+VariableSymbol::VariableSymbol(shared_ptr<TypeSymbol> type){
+	this->type = type;
+}
+
+VariableSymbol::VariableSymbol(int ID, int SymbolType):Symbol(ID,SymbolType) {
+    level = 0;
+}
 
 FunctionSymbol::FunctionSymbol(int ID, int SymbolType):Symbol(ID,SymbolType) {}
 
@@ -103,4 +109,6 @@ shared_ptr<Scope> currentScope;
 shared_ptr<Scope> globeScope;
 shared_ptr<TypeSymbol> IntType;
 string SystemError = "";
+shared_ptr<FunctionSymbol> ReadFunc;
+shared_ptr<FunctionSymbol> WriteFunc;
 

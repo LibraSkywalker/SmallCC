@@ -1,12 +1,7 @@
-int b;
+int a;
 int main(){
-	int a  = b;
-     b;
-	for (b = 1; b <= n; b){
-        a = (a + b) * (a - b);
-        if (a > 100) return a;
-        else return a + 100;
-        if (b - a < 10) break;
-        if (b + a > 999) continue;
-	}
+	int c,b;
+	b = a;
+	write(100);
+	return 0;
 }

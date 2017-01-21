@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1484960386 source:/home/bill1996/ClionProjects/SmallCC/AST.cpp
+1484964610 source:/home/bill1996/ClionProjects/SmallCC/AST.cpp
 	"AST.h"
 	"ConstHeader.h"
 
@@ -18,7 +18,7 @@
 
 1484930770 /home/bill1996/ClionProjects/SmallCC/ConstHeader.h
 
-1484960404 source:/home/bill1996/ClionProjects/SmallCC/lexer.cpp
+1484964946 source:/home/bill1996/ClionProjects/SmallCC/lexer.cpp
 	<stdio.h>
 	<string.h>
 	<errno.h>
@@ -30,14 +30,14 @@
 	"parser.hpp"
 	<unistd.h>
 
-1484960404 /home/bill1996/ClionProjects/SmallCC/parser.hpp
+1484964946 /home/bill1996/ClionProjects/SmallCC/parser.hpp
 
 1484958893 source:/home/bill1996/ClionProjects/SmallCC/main.cpp
 	<iostream>
 	"AST.h"
 	"semanticAnalyzer.h"
 
-1484960404 source:/home/bill1996/ClionProjects/SmallCC/parser.cpp
+1484964946 source:/home/bill1996/ClionProjects/SmallCC/parser.cpp
 	<stdio.h>
 	<stdlib.h>
 	<string>
@@ -51,7 +51,7 @@
 	<stdlib.h>
 	<stdio.h>
 
-1484959059 source:/home/bill1996/ClionProjects/SmallCC/semanticAnalyzer.cpp
+1484964783 source:/home/bill1996/ClionProjects/SmallCC/semanticAnalyzer.cpp
 	"semanticAnalyzer.h"
 	<iostream>
 

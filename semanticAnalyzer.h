@@ -34,6 +34,7 @@ public:
     int getLevel();
     void setLevel(int level);
     VariableSymbol(int ID,int SymbolType);
+	VariableSymbol(shared_ptr<TypeSymbol> type);
     void setType(shared_ptr<TypeSymbol> type);
 };
 
@@ -71,6 +72,7 @@ extern shared_ptr<Scope> currentScope;
 extern shared_ptr<Scope> globeScope;
 extern shared_ptr<TypeSymbol> IntType;
 extern string SystemError;
-
+extern shared_ptr<FunctionSymbol> ReadFunc;
+extern shared_ptr<FunctionSymbol> WriteFunc;
 
 #endif // SEMANTICANALYZER_H_INCLUDED

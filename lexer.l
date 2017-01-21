@@ -11,7 +11,7 @@
 
 OCT 0[1-7]([0-7])*
 HEX 0[xX][1-9A-F]([0-9A-F])*
-DEC [1-9]([0-9])*
+DEC ([0-9])*
 ID [a-zA-Z_]([0-9a-zA-Z_])*
 
 %%
@@ -74,24 +74,30 @@ ID [a-zA-Z_]([0-9a-zA-Z_])*
 "-=" {return MINUSASSIGN;}
 "*=" {return MULTIPLYASSIGN;}
 "/=" {return DIVIDEASSIGN;}
-"struct" {printf("struct");return STRUCT;}
+"struct" {return STRUCT;}
 "return" {return RETURN;}
 "if" {return IF;}
 "else" {return ELSE;}
 "break" {return BREAK;}
 "continue" {return CONT;}
 "for" {return FOR;}
-"read" {return READ;}
-"write" {return WRITE;}
+"read" {
+	yylval.string_value = new std::string(yytext);
+	return READ;
+}
+"write" {
+	yylval.string_value = new std::string(yytext);
+	return WRITE;
+}
 
 {ID} {
 	yylval.string_value = new std::string(yytext);
 	return ID;
 }
 
-. {  
-    std::cout << "lexical error" << std::endl;  
-    exit(1);  
-}  
+. {
+    std::cout << "lexical error on line"<< yylineno << std::endl;
+    exit(1);
+}
 
 %%

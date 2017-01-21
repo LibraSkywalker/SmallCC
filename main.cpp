@@ -4,6 +4,22 @@
 using namespace std;
 EventList* Globe;
 
+void semanticAnalyze(){
+	{
+        globeScope = currentScope = make_shared<Scope>();
+        IntType = std::static_pointer_cast<TypeSymbol>(globeScope->putVariable("int",TYPESYMBOL));
+		ReadFunc = std::static_pointer_cast<FunctionSymbol>(globeScope->putVariable("read",FUNCTIONSYMBOL));
+		WriteFunc = std::static_pointer_cast<FunctionSymbol>(globeScope->putVariable("write",FUNCTIONSYMBOL));
+		ReadFunc->addParameter(make_shared<VariableSymbol>(IntType));
+		WriteFunc->addParameter(make_shared<VariableSymbol>(IntType));
+        if (!Globe->check()){
+            cout << "Semantic check failed\n" + SystemError << endl;
+        } else {
+            cout << "Semantic check succeed\n" << endl;
+        }
+    }
+}
+
 int main()  
 {  
     extern int yyparse(void);  
@@ -16,15 +32,8 @@ int main()
         return 1;
     }
 
-    {
-        globeScope = currentScope = make_shared<Scope>();
-        IntType = std::static_pointer_cast<TypeSymbol>(globeScope->putVariable("int",TYPESYMBOL));
-        if (!Globe->check()){
-            cout << "Semantic check failed\n" + SystemError << endl;
-        } else {
-            cout << "Semantic check succeed\n" << endl;
-        }
-    }
+	semanticAnalyze();
+    
 
     return 0;
 }  

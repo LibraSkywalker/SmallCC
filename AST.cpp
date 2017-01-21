@@ -81,17 +81,21 @@ bool BinaryExpression::check() {
         return false;
     }
     if (!this->Left->left){
-        SystemError = "Should be left value during assign";
         switch (this->command) {
             case ASSIGN_OP :
+                SystemError = "Should be left value during assign";
                 return false;
             case DIVIDE_ASSIGN_OP:
+                SystemError = "Should be left value during assign";
                 return false;
             case MINUS_ASSIGN_OP:
+                SystemError = "Should be left value during assign";
                 return false;
             case PLUS_ASSIGN_OP:
+                SystemError = "Should be left value during assign";
                 return false;
             case MULTIPLY_ASSIGN_OP:
+                SystemError = "Should be left value during assign";
                 return false;
             default:;
         }
@@ -163,14 +167,14 @@ bool BranchStatement::check() {
         return false;
     }
     leftScope = currentScope = make_shared<Scope>(currentScope);
-    if (!this->AcceptStatement){
+    if (!this->AcceptStatement->check()){
         return false;
     }
+    currentScope = currentScope->prev();
 	//TODO: nullptr
 	if (this->hasDenyStatement){
-    	currentScope = currentScope->prev();
     	rightScope = currentScope =make_shared<Scope>(currentScope);
-    	if (!this->DenyStatement){
+    	if (!this->DenyStatement->check()){
         	return false;
     	}
     	currentScope = currentScope->prev();
@@ -329,6 +333,7 @@ bool FunctionCall::check() {
     }
     this->left = false;
     this->type = IntType;
+    return true;
 }
 
 InitVariable::InitVariable(string name, Expression* initializer, int command):Variable(name) {
@@ -345,6 +350,7 @@ bool InitVariable::check() {
         SystemError = "The initializer should be INT type\n";
         return false;
     }
+    return true;
 }
 
 bool InitArrayVariable::check() {
@@ -369,6 +375,7 @@ bool InitArrayVariable::check() {
             return false;
         }
     }
+    return true;
 }
 
 
@@ -396,6 +403,7 @@ bool JumpStatement::check() {
             }
         }
     }
+    return true;
 }
 
 JumpStatement::JumpStatement(Expression *returnValue) {
@@ -556,6 +564,11 @@ bool Variable::check() {
             return false;
         }
     }
+    if (this->variableSymbol->getLevel() > 0 ){
+        SystemError = "Cannot call array value by its pointer.";
+        return false;
+    }
+    this->type = this->variableSymbol->type;
     this->left = true;
     return true;
 }

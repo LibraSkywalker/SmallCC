@@ -33,9 +33,9 @@
 }
 
 %token<int_value> INT
-%token<string_value> ID TYPE
+%token<string_value> ID TYPE READ WRITE
 
-%token SEMI COMMA DOT ASSIGN BITAND BITXOR BITOR LOGICAND LOGICOR NEGATIVE SELFTUNE LB RB LC RC LP RP STRUCT RETURN IF ELSE BREAK CONT FOR READ WRITE
+%token SEMI COMMA DOT ASSIGN BITAND BITXOR BITOR LOGICAND LOGICOR NEGATIVE SELFTUNE LB RB LC RC LP RP STRUCT RETURN IF ELSE BREAK CONT FOR 
 %token SEQ SNE SLT SLE SGT SGE SHL SHR
 %token ADD AND BAND BNOT BXOR BOR DIV DIVIDEASSIGN MINUSASSIGN INC DEC MOD MUL MULTIPLYASSIGN NOT OR PLUSASSIGN SUB THEN
 
@@ -45,6 +45,7 @@
 %type<branch_value> branchStatement
 %type<jump_value> jumpStatement
 %type<loop_value> loopStatement
+%type<string_value> buildInFunction
 %type<block_value> blockStatement
 %type<statement_value> Statement
 %type<function_value> functionDeclare
@@ -156,7 +157,7 @@ branchStatement : IF LP expression RP Statement ELSE Statement {$$ = new BranchS
 | IF LP expression RP Statement {$$ = new BranchStatement($3,$5);}
 ;
 
-loopStatement : FOR LP expression COMMA expression COMMA expression RP Statement{
+loopStatement : FOR LP expression SEMI expression SEMI expression RP Statement{
         $$ = new LoopStatement($3,$5,$7,$9);
 }
 ;
@@ -167,7 +168,8 @@ expression : INT {$$ = new Literal($1);}
 | LP expression RP {$$ = $2;}
 | ID DOT ID {$$ = new Attribute(*$1,*$3);}
 | ID arrs {$$ = new ArrayVariable(*$1,*$2);}
-| ID LP arguments RP {$$ = new FunctionCall(*$1,$3);}
+| buildInFunction LP arguments RP {$$ = new FunctionCall(*$1,*$3);}
+| ID LP arguments RP {$$ = new FunctionCall(*$1,*$3);}
 | negative expression {$$ = new UnaryExpression($2,$1);}
 | selftune expression {$$ = new UnaryExpression($2,$1);}
 | expression calculate_ONE expression {$$ = new BinaryExpression($1,$3,$2);}
@@ -230,6 +232,9 @@ compare_TWO : SEQ {$$ = SEQ_OP;}
     | SNE {$$ = SNE_OP;}
 ;
 
+buildInFunction : READ {$$ = $1;}
+	| WRITE {$$ = $1;}
+;
 
 assign : ASSIGN {$$ = ASSIGN_OP;}
     | PLUSASSIGN {$$ = PLUS_ASSIGN_OP;}
