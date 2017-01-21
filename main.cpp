@@ -22,6 +22,9 @@ void semanticAnalyze(){
 }
 
 void mipsCodeGenerate(){
+    cout <<".data"<< endl << endl;
+    cout <<"VReg: .space 4096" << endl;
+    cout <<".text"<< endl << endl;
     Globe->generate();
 }
 
