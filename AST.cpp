@@ -4,7 +4,7 @@
 bool ArrayVariable::check() {
     //array call
     if (this->variableSymbol == nullptr){
-        this->variableSymbol = make_shared(currentScope->getVariable(this->name,VARIABLESYMBOL)) ;
+        this->variableSymbol = std::static_pointer_cast<VariableSymbol>(currentScope->getVariable(this->name,VARIABLESYMBOL)) ;
         if (this->variableSymbol == nullptr){
             SystemError = "Undeclared Variable: " + this->name + "\n";
             return false;
@@ -54,7 +54,7 @@ Attribute::Attribute(string name, string attribute) {
 }
 
 bool Attribute::check() {
-    shared_ptr<VariableSymbol> thisVariable = make_shared(currentScope->getVariable(this->name,VARIABLESYMBOL));
+    shared_ptr<VariableSymbol> thisVariable = std::static_pointer_cast<VariableSymbol>(currentScope->getVariable(this->name,VARIABLESYMBOL));
     if (thisVariable == nullptr){
         SystemError = "Undeclared Variable: " + this->name + "\n";
         return false;
@@ -109,8 +109,8 @@ bool BinaryExpression::check() {
 }
 
 BinaryExpression::BinaryExpression(Expression* Left, Expression* Right, int command) {
-    this->Left = shared_ptr(Left);
-    this->Right = shared_ptr(Right);
+    this->Left = shared_ptr<Expression>(Left);
+    this->Right = shared_ptr<Expression>(Right);
     this->command = command;
     this->classType = BINARY_CLASS;
 }
@@ -140,16 +140,16 @@ BranchStatement::BranchStatement() {
 }
 
 BranchStatement::BranchStatement(Expression* condition, Statement* AcceptStatement) {
-    this->condition = shared_ptr(condition);
-    this->AcceptStatement = shared_ptr(AcceptStatement);
+    this->condition = shared_ptr<Expression>(condition);
+    this->AcceptStatement = shared_ptr<Statement>(AcceptStatement);
     this->hasDenyStatement = false;
     this->classType = BRANCH_CLASS;
 }
 
 BranchStatement::BranchStatement(Expression* condition, Statement* AcceptStatement, Statement* DenyStatement) {
-    this->condition = shared_ptr(condition);
-    this->AcceptStatement = shared_ptr(AcceptStatement);
-    this->DenyStatement = shared_ptr(DenyStatement);
+    this->condition = shared_ptr<Expression>(condition);
+    this->AcceptStatement = shared_ptr<Statement>(AcceptStatement);
+    this->DenyStatement = shared_ptr<Statement>(DenyStatement);
     this->hasDenyStatement = true;
     this->classType = BRANCH_CLASS;
 }
@@ -162,21 +162,24 @@ bool BranchStatement::check() {
         SystemError = "Should be Int type in branch condition!";
         return false;
     }
-    leftScope = currentScope = new Scope(currentScope);
+    leftScope = currentScope = make_shared<Scope>(currentScope);
     if (!this->AcceptStatement){
         return false;
     }
-    currentScope = currentScope->prev();
-    rightScope = currentScope = new Scope(currentScope);
-    if (!this->DenyStatement){
-        return false;
-    }
-    currentScope = currentScope->prev();
+	//TODO: nullptr
+	if (this->hasDenyStatement){
+    	currentScope = currentScope->prev();
+    	rightScope = currentScope =make_shared<Scope>(currentScope);
+    	if (!this->DenyStatement){
+        	return false;
+    	}
+    	currentScope = currentScope->prev();
+	}
     return true;
 }
 
 Declaration::Declaration(Type* type, VariableList& variableList) {
-    this->type = shared_ptr(type);
+    this->type = shared_ptr<Type>(type);
     this->variableList = variableList;
     this->classType = DECLARE_CLASS;
 }
@@ -191,27 +194,27 @@ Declaration::Declaration(string type_name,VariableList& variableList){
 bool Declaration::check() {
     if (this->type_name != ""){
         for (shared_ptr<Variable> now : this->variableList.data){
-            shared_ptr<VariableSymbol> nowSymbol = make_shared(currentScope->putVariable(now->name,VARIABLESYMBOL)) ;
+            shared_ptr<VariableSymbol> nowSymbol = static_pointer_cast<VariableSymbol>(currentScope->putVariable(now->name,VARIABLESYMBOL)) ;
             if (nowSymbol == nullptr) {
                 SystemError = "Variable Redeclare: "+ now->name + "\n";
                 return false;
             }
             nowSymbol->setType(IntType);
             now->variableSymbol = nowSymbol;
-            now->check();
+            if (!now->check()) return false;
         }
     } else {
-        if (!this->type.check()) return false;
+        if (!this->type->check()) return false;
         shared_ptr<TypeSymbol> thisType = this->type->typeSymbol;
         for (shared_ptr<Variable> now : this->variableList.data){
-            shared_ptr<VariableSymbol> nowSymbol = make_shared(currentScope->putVariable(now->name,VARIABLESYMBOL));
+            shared_ptr<VariableSymbol> nowSymbol = static_pointer_cast<VariableSymbol>(currentScope->putVariable(now->name,VARIABLESYMBOL));
             if (nowSymbol == nullptr) {
                 SystemError = "Variable Redeclare.";
                 return false;
             }
             nowSymbol->setType(thisType);
             now->variableSymbol = nowSymbol;
-            now->check();
+            if (!now->check()) return false;
         }
     }
 
@@ -257,13 +260,13 @@ void ExpressionList::insert(Expression* now) {
 }
 
 bool Function::check() {
-    shared_ptr<FunctionSymbol> thisFunction = make_shared(globeScope->putVariable(this->name,FUNCTIONSYMBOL));
+    shared_ptr<FunctionSymbol> thisFunction = static_pointer_cast<FunctionSymbol>(globeScope->putVariable(this->name,FUNCTIONSYMBOL));
     if (thisFunction == nullptr){
         SystemError = "Function Redeclare:" + this->name + "\n";
         return false;
     }
     thisFunction->returnType = IntType;
-    currentScope = new Scope(currentScope);
+    currentScope = make_shared<Scope>(currentScope);
     thisFunction->parameterScope = currentScope;
     for (shared_ptr<Variable> parameter : parameters.data){
         if (!parameter->check()){
@@ -276,9 +279,9 @@ bool Function::check() {
         //TODO
         thisFunction->addParameter(parameter->variableSymbol);
     }
-    currentScope = new Scope(currentScope);
+    currentScope = make_shared<Scope>(currentScope);
 
-    if (!this->functionBody.check()){
+    if (!this->functionBody->check()){
         return false;
     }
 
@@ -291,7 +294,7 @@ bool Function::check() {
 Function::Function(string type_name,string name,BlockStatement* functionBody){
     this->type_name = type_name;
     this->name = name;
-    this->functionBody = shared_ptr(functionBody) ;
+    this->functionBody = shared_ptr<BlockStatement>(functionBody) ;
     this->classType = FUNCTION_CLASS;
 }
 
@@ -299,7 +302,7 @@ Function::Function(string type_name, string name, VariableList& parameterList, B
     this->type_name = type_name;
     this->name = name;
     this->parameters = parameterList;
-    this->functionBody = shared_ptr(functionBody) ;
+    this->functionBody = shared_ptr<BlockStatement>(functionBody) ;
     this->classType = FUNCTION_CLASS;
 }
 
@@ -312,7 +315,7 @@ FunctionCall::FunctionCall(string name, ExpressionList& parameters) {
 }
 
 bool FunctionCall::check() {
-    shared_ptr<FunctionSymbol> thisFunction = make_shared(globeScope->getVariable(this->name,FUNCTIONSYMBOL));
+    shared_ptr<FunctionSymbol> thisFunction = static_pointer_cast<FunctionSymbol>(globeScope->getVariable(this->name,FUNCTIONSYMBOL));
     if (thisFunction->parameterVariable.size() != this->parameters.data.size()){
         SystemError = "The number of parameters are not matched\n" ;
         return false;
@@ -330,7 +333,7 @@ bool FunctionCall::check() {
 
 InitVariable::InitVariable(string name, Expression* initializer, int command):Variable(name) {
     this->command = command;
-    this->initializer = shared_ptr(initializer);
+    this->initializer = shared_ptr<Expression>(initializer);
     this->classType = INITVARIABLE_CLASS;
 }
 
@@ -396,7 +399,7 @@ bool JumpStatement::check() {
 }
 
 JumpStatement::JumpStatement(Expression *returnValue) {
-    this->returnValue = shared_ptr(returnValue);
+    this->returnValue = shared_ptr<Expression>(returnValue);
 }
 
 JumpStatement::JumpStatement() {
@@ -428,10 +431,10 @@ LoopStatement::LoopStatement() {
 }
 
 LoopStatement::LoopStatement(Expression* initializer, Expression* condition, Expression* iteration,Statement* loopBody) {
-    this->initializer = shared_ptr(initializer);
-    this->condition = shared_ptr(condition);
-    this->iteration = shared_ptr(iteration);
-	this->loopBody = shared_ptr(loopBody);
+    this->initializer = shared_ptr<Expression>(initializer);
+    this->condition = shared_ptr<Expression>(condition);
+    this->iteration = shared_ptr<Expression>(iteration);
+	this->loopBody = shared_ptr<Statement>(loopBody);
     this->classType = LOOP_CLASS;
 }
 
@@ -444,7 +447,7 @@ bool LoopStatement::check()  {
         SystemError = "Should be Int type in loop condition!";
         return false;
     }
-    loopScope = currentScope = new Scope(currentScope,LOOPSCOPE);
+    loopScope = currentScope =make_shared<Scope>(currentScope,LOOPSCOPE);
 
     if (!this->loopBody->check()){
         return false;
@@ -456,7 +459,7 @@ bool LoopStatement::check()  {
 
 Type::Type(Declaration* newDeclaration) {
     this->declarationList = list<shared_ptr<Declaration>>();
-    this->declarationList.push_front(shared_ptr(newDeclaration));
+    this->declarationList.push_front(shared_ptr<Declaration>(newDeclaration));
     this->declare = true;
     this->classType = TYPE_CLASS;
 }
@@ -472,13 +475,13 @@ bool Type::check() {
         if (name == ""){
             this->typeSymbol = globeScope->putAnonymousType();
         } else {
-            this->typeSymbol =(TypeSymbol*) globeScope->putVariable(name,TYPESYMBOL);
+            this->typeSymbol = static_pointer_cast<TypeSymbol>(globeScope->putVariable(name,TYPESYMBOL));
             if (this->typeSymbol == nullptr){
                 SystemError = "Type Redeclare: " + name + "\n";
                 return false;
             }
         }
-        currentScope = new Scope(currentScope);
+        currentScope = make_shared<Scope>(currentScope);
         typeSymbol->memberScope = currentScope;
         for (shared_ptr<Declaration> declaration: declarationList){
             declaration->check();
@@ -488,7 +491,7 @@ bool Type::check() {
         }
         currentScope = currentScope->prev();
     } else {
-        shared_ptr<TypeSymbol> thisType = shared_ptr(globeScope->getVariable(name,TYPESYMBOL));
+        shared_ptr<TypeSymbol> thisType = static_pointer_cast<TypeSymbol>(globeScope->getVariable(name,TYPESYMBOL));
         if (thisType == nullptr){
             SystemError = "Undeclared Type:" + name + "\n";
             return false;
@@ -500,7 +503,7 @@ bool Type::check() {
 }
 
 void Type::insert(Declaration* newDeclaration) {
-    this->declarationList.push_front(shared_ptr(newDeclaration));
+    this->declarationList.push_front(shared_ptr<Declaration>(newDeclaration));
 }
 
 void Type::getName(string name) {
@@ -512,7 +515,7 @@ UnaryExpression::UnaryExpression() {
 }
 
 UnaryExpression::UnaryExpression(Expression* child, int command) {
-    this->child = child;
+    this->child = shared_ptr<Expression>(child);
     this->command = command;
     this->classType = UNARY_CLASS;
 }
@@ -547,7 +550,7 @@ Variable::Variable(string type_name,string name){
 bool Variable::check() {
     // variable ask
     if (this->variableSymbol == nullptr){
-        this->variableSymbol = (VariableSymbol*) currentScope->getVariable(this->name,VARIABLESYMBOL);
+        this->variableSymbol = static_pointer_cast<VariableSymbol>(currentScope->getVariable(this->name,VARIABLESYMBOL));
         if (this->variableSymbol == nullptr){
             SystemError = "Undeclared Variable: " + this->name + "\n";
             return false;
@@ -559,11 +562,11 @@ bool Variable::check() {
 
 
 void VariableList::insert(Variable* now){
-    data.push_front(shared_ptr(now));
+    data.push_front(shared_ptr<Variable>(now));
 }
 
 VariableList::VariableList(Variable* now) {
     data = list<shared_ptr<Variable>>();
-    data.push_front(shared_ptr(now));
+    data.push_front(shared_ptr<Variable>(now));
     this->classType = VARIABLELIST_CLASS;
 }

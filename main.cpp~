@@ -17,7 +17,7 @@ int main()
     }
 
     {
-        globeScope = currentScope = make_shared<Scope>();
+        globeScope = currentScope =shared_ptr<Scope>(new Scope());
         IntType = std::static_pointer_cast<TypeSymbol>(globeScope->putVariable("int",TYPESYMBOL));
         if (!Globe->check()){
             cout << "Semantic check failed\n" + SystemError << endl;

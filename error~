@@ -1,0 +1,580 @@
+AST.cpp: In member function ‘virtual bool ArrayVariable::check()’:
+AST.cpp:7:96: error: no matching function for call to ‘make_shared(std::shared_ptr<Symbol>)’
+         this->variableSymbol = make_shared(currentScope->getVariable(this->name,VARIABLESYMBOL)) ;
+                                                                                                ^
+AST.cpp:7:96: note: candidate is:
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:610:5: note: template<class _Tp, class ... _Args> std::shared_ptr<_Tp1> std::make_shared(_Args&& ...)
+     make_shared(_Args&&... __args)
+     ^
+/usr/include/c++/4.8/bits/shared_ptr.h:610:5: note:   template argument deduction/substitution failed:
+AST.cpp:7:96: note:   couldn't deduce template parameter ‘_Tp’
+         this->variableSymbol = make_shared(currentScope->getVariable(this->name,VARIABLESYMBOL)) ;
+                                                                                                ^
+AST.cpp: In member function ‘virtual bool Attribute::check()’:
+AST.cpp:57:111: error: no matching function for call to ‘make_shared(std::shared_ptr<Symbol>)’
+     shared_ptr<VariableSymbol> thisVariable = make_shared(currentScope->getVariable(this->name,VARIABLESYMBOL));
+                                                                                                               ^
+AST.cpp:57:111: note: candidate is:
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:610:5: note: template<class _Tp, class ... _Args> std::shared_ptr<_Tp1> std::make_shared(_Args&& ...)
+     make_shared(_Args&&... __args)
+     ^
+/usr/include/c++/4.8/bits/shared_ptr.h:610:5: note:   template argument deduction/substitution failed:
+AST.cpp:57:111: note:   couldn't deduce template parameter ‘_Tp’
+     shared_ptr<VariableSymbol> thisVariable = make_shared(currentScope->getVariable(this->name,VARIABLESYMBOL));
+                                                                                                               ^
+AST.cpp: In constructor ‘BinaryExpression::BinaryExpression(Expression*, Expression*, int)’:
+AST.cpp:112:28: error: missing template arguments before ‘(’ token
+     this->Left = shared_ptr(Left);
+                            ^
+AST.cpp:113:29: error: missing template arguments before ‘(’ token
+     this->Right = shared_ptr(Right);
+                             ^
+AST.cpp: In constructor ‘BranchStatement::BranchStatement(Expression*, Statement*)’:
+AST.cpp:143:33: error: missing template arguments before ‘(’ token
+     this->condition = shared_ptr(condition);
+                                 ^
+AST.cpp:144:39: error: missing template arguments before ‘(’ token
+     this->AcceptStatement = shared_ptr(AcceptStatement);
+                                       ^
+AST.cpp: In constructor ‘BranchStatement::BranchStatement(Expression*, Statement*, Statement*)’:
+AST.cpp:150:33: error: missing template arguments before ‘(’ token
+     this->condition = shared_ptr(condition);
+                                 ^
+AST.cpp:151:39: error: missing template arguments before ‘(’ token
+     this->AcceptStatement = shared_ptr(AcceptStatement);
+                                       ^
+AST.cpp:152:37: error: missing template arguments before ‘(’ token
+     this->DenyStatement = shared_ptr(DenyStatement);
+                                     ^
+AST.cpp: In member function ‘virtual bool BranchStatement::check()’:
+AST.cpp:165:30: error: no match for ‘operator=’ (operand types are ‘std::shared_ptr<Scope>’ and ‘Scope*’)
+     leftScope = currentScope = new Scope(currentScope);
+                              ^
+AST.cpp:165:30: note: candidates are:
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:268:19: note: std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(const std::shared_ptr<_Tp>&) [with _Tp = Scope]
+       shared_ptr& operator=(const shared_ptr&) noexcept = default;
+                   ^
+/usr/include/c++/4.8/bits/shared_ptr.h:268:19: note:   no known conversion for argument 1 from ‘Scope*’ to ‘const std::shared_ptr<Scope>&’
+/usr/include/c++/4.8/bits/shared_ptr.h:272:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(const std::shared_ptr<_Tp1>&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(const shared_ptr<_Tp1>& __r) noexcept
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:272:2: note:   template argument deduction/substitution failed:
+AST.cpp:165:30: note:   mismatched types ‘const std::shared_ptr<_Tp1>’ and ‘Scope*’
+     leftScope = currentScope = new Scope(currentScope);
+                              ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:281:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::auto_ptr<_Up>&&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(std::auto_ptr<_Tp1>&& __r)
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:281:2: note:   template argument deduction/substitution failed:
+AST.cpp:165:30: note:   mismatched types ‘std::auto_ptr<_Up>’ and ‘Scope*’
+     leftScope = currentScope = new Scope(currentScope);
+                              ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:289:7: note: std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::shared_ptr<_Tp>&&) [with _Tp = Scope]
+       operator=(shared_ptr&& __r) noexcept
+       ^
+/usr/include/c++/4.8/bits/shared_ptr.h:289:7: note:   no known conversion for argument 1 from ‘Scope*’ to ‘std::shared_ptr<Scope>&&’
+/usr/include/c++/4.8/bits/shared_ptr.h:297:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::shared_ptr<_Tp1>&&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(shared_ptr<_Tp1>&& __r) noexcept
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:297:2: note:   template argument deduction/substitution failed:
+AST.cpp:165:30: note:   mismatched types ‘std::shared_ptr<_Tp1>’ and ‘Scope*’
+     leftScope = currentScope = new Scope(currentScope);
+                              ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:305:2: note: template<class _Tp1, class _Del> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::unique_ptr<_Up, _Ep>&&) [with _Tp1 = _Tp1; _Del = _Del; _Tp = Scope]
+  operator=(std::unique_ptr<_Tp1, _Del>&& __r)
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:305:2: note:   template argument deduction/substitution failed:
+AST.cpp:165:30: note:   mismatched types ‘std::unique_ptr<_Tp, _Dp>’ and ‘Scope*’
+     leftScope = currentScope = new Scope(currentScope);
+                              ^
+AST.cpp:170:31: error: no match for ‘operator=’ (operand types are ‘std::shared_ptr<Scope>’ and ‘Scope*’)
+     rightScope = currentScope = new Scope(currentScope);
+                               ^
+AST.cpp:170:31: note: candidates are:
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:268:19: note: std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(const std::shared_ptr<_Tp>&) [with _Tp = Scope]
+       shared_ptr& operator=(const shared_ptr&) noexcept = default;
+                   ^
+/usr/include/c++/4.8/bits/shared_ptr.h:268:19: note:   no known conversion for argument 1 from ‘Scope*’ to ‘const std::shared_ptr<Scope>&’
+/usr/include/c++/4.8/bits/shared_ptr.h:272:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(const std::shared_ptr<_Tp1>&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(const shared_ptr<_Tp1>& __r) noexcept
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:272:2: note:   template argument deduction/substitution failed:
+AST.cpp:170:31: note:   mismatched types ‘const std::shared_ptr<_Tp1>’ and ‘Scope*’
+     rightScope = currentScope = new Scope(currentScope);
+                               ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:281:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::auto_ptr<_Up>&&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(std::auto_ptr<_Tp1>&& __r)
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:281:2: note:   template argument deduction/substitution failed:
+AST.cpp:170:31: note:   mismatched types ‘std::auto_ptr<_Up>’ and ‘Scope*’
+     rightScope = currentScope = new Scope(currentScope);
+                               ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:289:7: note: std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::shared_ptr<_Tp>&&) [with _Tp = Scope]
+       operator=(shared_ptr&& __r) noexcept
+       ^
+/usr/include/c++/4.8/bits/shared_ptr.h:289:7: note:   no known conversion for argument 1 from ‘Scope*’ to ‘std::shared_ptr<Scope>&&’
+/usr/include/c++/4.8/bits/shared_ptr.h:297:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::shared_ptr<_Tp1>&&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(shared_ptr<_Tp1>&& __r) noexcept
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:297:2: note:   template argument deduction/substitution failed:
+AST.cpp:170:31: note:   mismatched types ‘std::shared_ptr<_Tp1>’ and ‘Scope*’
+     rightScope = currentScope = new Scope(currentScope);
+                               ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:305:2: note: template<class _Tp1, class _Del> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::unique_ptr<_Up, _Ep>&&) [with _Tp1 = _Tp1; _Del = _Del; _Tp = Scope]
+  operator=(std::unique_ptr<_Tp1, _Del>&& __r)
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:305:2: note:   template argument deduction/substitution failed:
+AST.cpp:170:31: note:   mismatched types ‘std::unique_ptr<_Tp, _Dp>’ and ‘Scope*’
+     rightScope = currentScope = new Scope(currentScope);
+                               ^
+AST.cpp: In constructor ‘Declaration::Declaration(Type*, VariableList&)’:
+AST.cpp:179:28: error: missing template arguments before ‘(’ token
+     this->type = shared_ptr(type);
+                            ^
+AST.cpp: In member function ‘virtual bool Declaration::check()’:
+AST.cpp:194:115: error: no matching function for call to ‘make_shared(std::shared_ptr<Symbol>)’
+             shared_ptr<VariableSymbol> nowSymbol = make_shared(currentScope->putVariable(now->name,VARIABLESYMBOL)) ;
+                                                                                                                   ^
+AST.cpp:194:115: note: candidate is:
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:610:5: note: template<class _Tp, class ... _Args> std::shared_ptr<_Tp1> std::make_shared(_Args&& ...)
+     make_shared(_Args&&... __args)
+     ^
+/usr/include/c++/4.8/bits/shared_ptr.h:610:5: note:   template argument deduction/substitution failed:
+AST.cpp:194:115: note:   couldn't deduce template parameter ‘_Tp’
+             shared_ptr<VariableSymbol> nowSymbol = make_shared(currentScope->putVariable(now->name,VARIABLESYMBOL)) ;
+                                                                                                                   ^
+AST.cpp:204:25: error: ‘class std::shared_ptr<Type>’ has no member named ‘check’
+         if (!this->type.check()) return false;
+                         ^
+AST.cpp:207:115: error: no matching function for call to ‘make_shared(std::shared_ptr<Symbol>)’
+             shared_ptr<VariableSymbol> nowSymbol = make_shared(currentScope->putVariable(now->name,VARIABLESYMBOL));
+                                                                                                                   ^
+AST.cpp:207:115: note: candidate is:
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:610:5: note: template<class _Tp, class ... _Args> std::shared_ptr<_Tp1> std::make_shared(_Args&& ...)
+     make_shared(_Args&&... __args)
+     ^
+/usr/include/c++/4.8/bits/shared_ptr.h:610:5: note:   template argument deduction/substitution failed:
+AST.cpp:207:115: note:   couldn't deduce template parameter ‘_Tp’
+             shared_ptr<VariableSymbol> nowSymbol = make_shared(currentScope->putVariable(now->name,VARIABLESYMBOL));
+                                                                                                                   ^
+AST.cpp: In member function ‘virtual bool Function::check()’:
+AST.cpp:260:109: error: no matching function for call to ‘make_shared(std::shared_ptr<Symbol>)’
+     shared_ptr<FunctionSymbol> thisFunction = make_shared(globeScope->putVariable(this->name,FUNCTIONSYMBOL));
+                                                                                                             ^
+AST.cpp:260:109: note: candidate is:
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:610:5: note: template<class _Tp, class ... _Args> std::shared_ptr<_Tp1> std::make_shared(_Args&& ...)
+     make_shared(_Args&&... __args)
+     ^
+/usr/include/c++/4.8/bits/shared_ptr.h:610:5: note:   template argument deduction/substitution failed:
+AST.cpp:260:109: note:   couldn't deduce template parameter ‘_Tp’
+     shared_ptr<FunctionSymbol> thisFunction = make_shared(globeScope->putVariable(this->name,FUNCTIONSYMBOL));
+                                                                                                             ^
+AST.cpp:266:18: error: no match for ‘operator=’ (operand types are ‘std::shared_ptr<Scope>’ and ‘Scope*’)
+     currentScope = new Scope(currentScope);
+                  ^
+AST.cpp:266:18: note: candidates are:
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:268:19: note: std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(const std::shared_ptr<_Tp>&) [with _Tp = Scope]
+       shared_ptr& operator=(const shared_ptr&) noexcept = default;
+                   ^
+/usr/include/c++/4.8/bits/shared_ptr.h:268:19: note:   no known conversion for argument 1 from ‘Scope*’ to ‘const std::shared_ptr<Scope>&’
+/usr/include/c++/4.8/bits/shared_ptr.h:272:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(const std::shared_ptr<_Tp1>&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(const shared_ptr<_Tp1>& __r) noexcept
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:272:2: note:   template argument deduction/substitution failed:
+AST.cpp:266:18: note:   mismatched types ‘const std::shared_ptr<_Tp1>’ and ‘Scope*’
+     currentScope = new Scope(currentScope);
+                  ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:281:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::auto_ptr<_Up>&&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(std::auto_ptr<_Tp1>&& __r)
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:281:2: note:   template argument deduction/substitution failed:
+AST.cpp:266:18: note:   mismatched types ‘std::auto_ptr<_Up>’ and ‘Scope*’
+     currentScope = new Scope(currentScope);
+                  ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:289:7: note: std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::shared_ptr<_Tp>&&) [with _Tp = Scope]
+       operator=(shared_ptr&& __r) noexcept
+       ^
+/usr/include/c++/4.8/bits/shared_ptr.h:289:7: note:   no known conversion for argument 1 from ‘Scope*’ to ‘std::shared_ptr<Scope>&&’
+/usr/include/c++/4.8/bits/shared_ptr.h:297:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::shared_ptr<_Tp1>&&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(shared_ptr<_Tp1>&& __r) noexcept
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:297:2: note:   template argument deduction/substitution failed:
+AST.cpp:266:18: note:   mismatched types ‘std::shared_ptr<_Tp1>’ and ‘Scope*’
+     currentScope = new Scope(currentScope);
+                  ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:305:2: note: template<class _Tp1, class _Del> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::unique_ptr<_Up, _Ep>&&) [with _Tp1 = _Tp1; _Del = _Del; _Tp = Scope]
+  operator=(std::unique_ptr<_Tp1, _Del>&& __r)
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:305:2: note:   template argument deduction/substitution failed:
+AST.cpp:266:18: note:   mismatched types ‘std::unique_ptr<_Tp, _Dp>’ and ‘Scope*’
+     currentScope = new Scope(currentScope);
+                  ^
+AST.cpp:279:18: error: no match for ‘operator=’ (operand types are ‘std::shared_ptr<Scope>’ and ‘Scope*’)
+     currentScope = new Scope(currentScope);
+                  ^
+AST.cpp:279:18: note: candidates are:
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:93:11: note: std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(const std::shared_ptr<_Tp>&) [with _Tp = Scope]
+     class shared_ptr : public __shared_ptr<_Tp>
+           ^
+/usr/include/c++/4.8/bits/shared_ptr.h:93:11: note:   no known conversion for argument 1 from ‘Scope*’ to ‘const std::shared_ptr<Scope>&’
+/usr/include/c++/4.8/bits/shared_ptr.h:272:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(const std::shared_ptr<_Tp1>&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(const shared_ptr<_Tp1>& __r) noexcept
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:272:2: note:   template argument deduction/substitution failed:
+AST.cpp:279:18: note:   mismatched types ‘const std::shared_ptr<_Tp1>’ and ‘Scope*’
+     currentScope = new Scope(currentScope);
+                  ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:281:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::auto_ptr<_Up>&&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(std::auto_ptr<_Tp1>&& __r)
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:281:2: note:   template argument deduction/substitution failed:
+AST.cpp:279:18: note:   mismatched types ‘std::auto_ptr<_Up>’ and ‘Scope*’
+     currentScope = new Scope(currentScope);
+                  ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:289:7: note: std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::shared_ptr<_Tp>&&) [with _Tp = Scope]
+       operator=(shared_ptr&& __r) noexcept
+       ^
+/usr/include/c++/4.8/bits/shared_ptr.h:289:7: note:   no known conversion for argument 1 from ‘Scope*’ to ‘std::shared_ptr<Scope>&&’
+/usr/include/c++/4.8/bits/shared_ptr.h:297:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::shared_ptr<_Tp1>&&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(shared_ptr<_Tp1>&& __r) noexcept
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:297:2: note:   template argument deduction/substitution failed:
+AST.cpp:279:18: note:   mismatched types ‘std::shared_ptr<_Tp1>’ and ‘Scope*’
+     currentScope = new Scope(currentScope);
+                  ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:305:2: note: template<class _Tp1, class _Del> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::unique_ptr<_Up, _Ep>&&) [with _Tp1 = _Tp1; _Del = _Del; _Tp = Scope]
+  operator=(std::unique_ptr<_Tp1, _Del>&& __r)
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:305:2: note:   template argument deduction/substitution failed:
+AST.cpp:279:18: note:   mismatched types ‘std::unique_ptr<_Tp, _Dp>’ and ‘Scope*’
+     currentScope = new Scope(currentScope);
+                  ^
+AST.cpp:281:29: error: ‘class std::shared_ptr<BlockStatement>’ has no member named ‘check’
+     if (!this->functionBody.check()){
+                             ^
+AST.cpp: In constructor ‘Function::Function(std::string, std::string, BlockStatement*)’:
+AST.cpp:294:36: error: missing template arguments before ‘(’ token
+     this->functionBody = shared_ptr(functionBody) ;
+                                    ^
+AST.cpp: In constructor ‘Function::Function(std::string, std::string, VariableList&, BlockStatement*)’:
+AST.cpp:302:36: error: missing template arguments before ‘(’ token
+     this->functionBody = shared_ptr(functionBody) ;
+                                    ^
+AST.cpp: In member function ‘virtual bool FunctionCall::check()’:
+AST.cpp:315:109: error: no matching function for call to ‘make_shared(std::shared_ptr<Symbol>)’
+     shared_ptr<FunctionSymbol> thisFunction = make_shared(globeScope->getVariable(this->name,FUNCTIONSYMBOL));
+                                                                                                             ^
+AST.cpp:315:109: note: candidate is:
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:610:5: note: template<class _Tp, class ... _Args> std::shared_ptr<_Tp1> std::make_shared(_Args&& ...)
+     make_shared(_Args&&... __args)
+     ^
+/usr/include/c++/4.8/bits/shared_ptr.h:610:5: note:   template argument deduction/substitution failed:
+AST.cpp:315:109: note:   couldn't deduce template parameter ‘_Tp’
+     shared_ptr<FunctionSymbol> thisFunction = make_shared(globeScope->getVariable(this->name,FUNCTIONSYMBOL));
+                                                                                                             ^
+AST.cpp: In constructor ‘InitVariable::InitVariable(std::string, Expression*, int)’:
+AST.cpp:333:35: error: missing template arguments before ‘(’ token
+     this->initializer = shared_ptr(initializer);
+                                   ^
+AST.cpp: In constructor ‘JumpStatement::JumpStatement(Expression*)’:
+AST.cpp:399:35: error: missing template arguments before ‘(’ token
+     this->returnValue = shared_ptr(returnValue);
+                                   ^
+AST.cpp: In constructor ‘LoopStatement::LoopStatement(Expression*, Expression*, Expression*, Statement*)’:
+AST.cpp:431:35: error: missing template arguments before ‘(’ token
+     this->initializer = shared_ptr(initializer);
+                                   ^
+AST.cpp:432:33: error: missing template arguments before ‘(’ token
+     this->condition = shared_ptr(condition);
+                                 ^
+AST.cpp:433:33: error: missing template arguments before ‘(’ token
+     this->iteration = shared_ptr(iteration);
+                                 ^
+AST.cpp:434:29: error: missing template arguments before ‘(’ token
+  this->loopBody = shared_ptr(loopBody);
+                             ^
+AST.cpp: In member function ‘virtual bool LoopStatement::check()’:
+AST.cpp:447:30: error: no match for ‘operator=’ (operand types are ‘std::shared_ptr<Scope>’ and ‘Scope*’)
+     loopScope = currentScope = new Scope(currentScope,LOOPSCOPE);
+                              ^
+AST.cpp:447:30: note: candidates are:
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:93:11: note: std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(const std::shared_ptr<_Tp>&) [with _Tp = Scope]
+     class shared_ptr : public __shared_ptr<_Tp>
+           ^
+/usr/include/c++/4.8/bits/shared_ptr.h:93:11: note:   no known conversion for argument 1 from ‘Scope*’ to ‘const std::shared_ptr<Scope>&’
+/usr/include/c++/4.8/bits/shared_ptr.h:272:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(const std::shared_ptr<_Tp1>&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(const shared_ptr<_Tp1>& __r) noexcept
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:272:2: note:   template argument deduction/substitution failed:
+AST.cpp:447:30: note:   mismatched types ‘const std::shared_ptr<_Tp1>’ and ‘Scope*’
+     loopScope = currentScope = new Scope(currentScope,LOOPSCOPE);
+                              ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:281:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::auto_ptr<_Up>&&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(std::auto_ptr<_Tp1>&& __r)
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:281:2: note:   template argument deduction/substitution failed:
+AST.cpp:447:30: note:   mismatched types ‘std::auto_ptr<_Up>’ and ‘Scope*’
+     loopScope = currentScope = new Scope(currentScope,LOOPSCOPE);
+                              ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:289:7: note: std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::shared_ptr<_Tp>&&) [with _Tp = Scope]
+       operator=(shared_ptr&& __r) noexcept
+       ^
+/usr/include/c++/4.8/bits/shared_ptr.h:289:7: note:   no known conversion for argument 1 from ‘Scope*’ to ‘std::shared_ptr<Scope>&&’
+/usr/include/c++/4.8/bits/shared_ptr.h:297:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::shared_ptr<_Tp1>&&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(shared_ptr<_Tp1>&& __r) noexcept
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:297:2: note:   template argument deduction/substitution failed:
+AST.cpp:447:30: note:   mismatched types ‘std::shared_ptr<_Tp1>’ and ‘Scope*’
+     loopScope = currentScope = new Scope(currentScope,LOOPSCOPE);
+                              ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:305:2: note: template<class _Tp1, class _Del> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::unique_ptr<_Up, _Ep>&&) [with _Tp1 = _Tp1; _Del = _Del; _Tp = Scope]
+  operator=(std::unique_ptr<_Tp1, _Del>&& __r)
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:305:2: note:   template argument deduction/substitution failed:
+AST.cpp:447:30: note:   mismatched types ‘std::unique_ptr<_Tp, _Dp>’ and ‘Scope*’
+     loopScope = currentScope = new Scope(currentScope,LOOPSCOPE);
+                              ^
+AST.cpp: In constructor ‘Type::Type(Declaration*)’:
+AST.cpp:459:48: error: missing template arguments before ‘(’ token
+     this->declarationList.push_front(shared_ptr(newDeclaration));
+                                                ^
+AST.cpp: In member function ‘virtual bool Type::check()’:
+AST.cpp:475:84: error: invalid cast from type ‘std::shared_ptr<Symbol>’ to type ‘TypeSymbol*’
+             this->typeSymbol =(TypeSymbol*) globeScope->putVariable(name,TYPESYMBOL);
+                                                                                    ^
+AST.cpp:481:22: error: no match for ‘operator=’ (operand types are ‘std::shared_ptr<Scope>’ and ‘Scope*’)
+         currentScope = new Scope(currentScope);
+                      ^
+AST.cpp:481:22: note: candidates are:
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:93:11: note: std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(const std::shared_ptr<_Tp>&) [with _Tp = Scope]
+     class shared_ptr : public __shared_ptr<_Tp>
+           ^
+/usr/include/c++/4.8/bits/shared_ptr.h:93:11: note:   no known conversion for argument 1 from ‘Scope*’ to ‘const std::shared_ptr<Scope>&’
+/usr/include/c++/4.8/bits/shared_ptr.h:272:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(const std::shared_ptr<_Tp1>&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(const shared_ptr<_Tp1>& __r) noexcept
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:272:2: note:   template argument deduction/substitution failed:
+AST.cpp:481:22: note:   mismatched types ‘const std::shared_ptr<_Tp1>’ and ‘Scope*’
+         currentScope = new Scope(currentScope);
+                      ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:281:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::auto_ptr<_Up>&&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(std::auto_ptr<_Tp1>&& __r)
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:281:2: note:   template argument deduction/substitution failed:
+AST.cpp:481:22: note:   mismatched types ‘std::auto_ptr<_Up>’ and ‘Scope*’
+         currentScope = new Scope(currentScope);
+                      ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:289:7: note: std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::shared_ptr<_Tp>&&) [with _Tp = Scope]
+       operator=(shared_ptr&& __r) noexcept
+       ^
+/usr/include/c++/4.8/bits/shared_ptr.h:289:7: note:   no known conversion for argument 1 from ‘Scope*’ to ‘std::shared_ptr<Scope>&&’
+/usr/include/c++/4.8/bits/shared_ptr.h:297:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::shared_ptr<_Tp1>&&) [with _Tp1 = _Tp1; _Tp = Scope]
+  operator=(shared_ptr<_Tp1>&& __r) noexcept
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:297:2: note:   template argument deduction/substitution failed:
+AST.cpp:481:22: note:   mismatched types ‘std::shared_ptr<_Tp1>’ and ‘Scope*’
+         currentScope = new Scope(currentScope);
+                      ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:305:2: note: template<class _Tp1, class _Del> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::unique_ptr<_Up, _Ep>&&) [with _Tp1 = _Tp1; _Del = _Del; _Tp = Scope]
+  operator=(std::unique_ptr<_Tp1, _Del>&& __r)
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:305:2: note:   template argument deduction/substitution failed:
+AST.cpp:481:22: note:   mismatched types ‘std::unique_ptr<_Tp, _Dp>’ and ‘Scope*’
+         currentScope = new Scope(currentScope);
+                      ^
+AST.cpp:491:53: error: missing template arguments before ‘(’ token
+         shared_ptr<TypeSymbol> thisType = shared_ptr(globeScope->getVariable(name,TYPESYMBOL));
+                                                     ^
+AST.cpp: In member function ‘void Type::insert(Declaration*)’:
+AST.cpp:503:48: error: missing template arguments before ‘(’ token
+     this->declarationList.push_front(shared_ptr(newDeclaration));
+                                                ^
+AST.cpp: In constructor ‘UnaryExpression::UnaryExpression(Expression*, int)’:
+AST.cpp:515:17: error: no match for ‘operator=’ (operand types are ‘std::shared_ptr<Expression>’ and ‘Expression*’)
+     this->child = child;
+                 ^
+AST.cpp:515:17: note: candidates are:
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:268:19: note: std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(const std::shared_ptr<_Tp>&) [with _Tp = Expression]
+       shared_ptr& operator=(const shared_ptr&) noexcept = default;
+                   ^
+/usr/include/c++/4.8/bits/shared_ptr.h:268:19: note:   no known conversion for argument 1 from ‘Expression*’ to ‘const std::shared_ptr<Expression>&’
+/usr/include/c++/4.8/bits/shared_ptr.h:272:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(const std::shared_ptr<_Tp1>&) [with _Tp1 = _Tp1; _Tp = Expression]
+  operator=(const shared_ptr<_Tp1>& __r) noexcept
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:272:2: note:   template argument deduction/substitution failed:
+AST.cpp:515:17: note:   mismatched types ‘const std::shared_ptr<_Tp1>’ and ‘Expression*’
+     this->child = child;
+                 ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:281:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::auto_ptr<_Up>&&) [with _Tp1 = _Tp1; _Tp = Expression]
+  operator=(std::auto_ptr<_Tp1>&& __r)
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:281:2: note:   template argument deduction/substitution failed:
+AST.cpp:515:17: note:   mismatched types ‘std::auto_ptr<_Up>’ and ‘Expression*’
+     this->child = child;
+                 ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:289:7: note: std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::shared_ptr<_Tp>&&) [with _Tp = Expression]
+       operator=(shared_ptr&& __r) noexcept
+       ^
+/usr/include/c++/4.8/bits/shared_ptr.h:289:7: note:   no known conversion for argument 1 from ‘Expression*’ to ‘std::shared_ptr<Expression>&&’
+/usr/include/c++/4.8/bits/shared_ptr.h:297:2: note: template<class _Tp1> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::shared_ptr<_Tp1>&&) [with _Tp1 = _Tp1; _Tp = Expression]
+  operator=(shared_ptr<_Tp1>&& __r) noexcept
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:297:2: note:   template argument deduction/substitution failed:
+AST.cpp:515:17: note:   mismatched types ‘std::shared_ptr<_Tp1>’ and ‘Expression*’
+     this->child = child;
+                 ^
+In file included from /usr/include/c++/4.8/memory:82:0,
+                 from semanticAnalyzer.h:5,
+                 from AST.h:8,
+                 from AST.cpp:1:
+/usr/include/c++/4.8/bits/shared_ptr.h:305:2: note: template<class _Tp1, class _Del> std::shared_ptr<_Tp>& std::shared_ptr<_Tp>::operator=(std::unique_ptr<_Up, _Ep>&&) [with _Tp1 = _Tp1; _Del = _Del; _Tp = Expression]
+  operator=(std::unique_ptr<_Tp1, _Del>&& __r)
+  ^
+/usr/include/c++/4.8/bits/shared_ptr.h:305:2: note:   template argument deduction/substitution failed:
+AST.cpp:515:17: note:   mismatched types ‘std::unique_ptr<_Tp, _Dp>’ and ‘Expression*’
+     this->child = child;
+                 ^
+AST.cpp: In member function ‘virtual bool Variable::check()’:
+AST.cpp:550:101: error: invalid cast from type ‘std::shared_ptr<Symbol>’ to type ‘VariableSymbol*’
+         this->variableSymbol = (VariableSymbol*) currentScope->getVariable(this->name,VARIABLESYMBOL);
+                                                                                                     ^
+AST.cpp: In member function ‘void VariableList::insert(Variable*)’:
+AST.cpp:562:31: error: missing template arguments before ‘(’ token
+     data.push_front(shared_ptr(now));
+                               ^
+AST.cpp: In constructor ‘VariableList::VariableList(Variable*)’:
+AST.cpp:567:31: error: missing template arguments before ‘(’ token
+     data.push_front(shared_ptr(now));
+                               ^

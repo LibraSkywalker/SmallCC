@@ -82,20 +82,20 @@ typeDeclare : STRUCT ID LC attributeDeclare RC{
 
 attributeDeclare : TYPE uninitializedVariables SEMI attributeDeclare{
     $$ = $4;
-    $$->insert(new Declaration($1,*$2));
+    $$->insert(new Declaration(*$1,*$2));
 }
-|TYPE uninitializedVariables SEMI {$$ = new Type(new Declaration($1,*$2));}
+|TYPE uninitializedVariables SEMI {$$ = new Type(new Declaration(*$1,*$2));}
 ;
 
-VariableDeclare : TYPE variables SEMI{$$ = new Declaration($1,*$2);}
+VariableDeclare : TYPE variables SEMI{$$ = new Declaration(*$1,*$2);}
 |   typeDeclare uninitializedVariables SEMI{$$ = new Declaration($1,*$2);}
 ;
 
 uninitializedVariables : ID COMMA uninitializedVariables{
     $$ = $3;
-    $$->insert(new Variable($1));
+    $$->insert(new Variable(*$1));
 }
-| ID  {$$ = new VariableList(new Variable($1));}
+| ID  {$$ = new VariableList(new Variable(*$1));}
 ;
 
 variables : variable COMMA variables {
@@ -166,8 +166,8 @@ expression : INT {$$ = new Literal($1);}
 | ID {$$ = new Variable(*$1);}
 | LP expression RP {$$ = $2;}
 | ID DOT ID {$$ = new Attribute(*$1,*$3);}
-| ID arrs {$$ = new ArrayVariable($1,$2);}
-| ID LP arguments RP {$$ = new FunctionCall(*$1,$3);}
+| ID arrs {$$ = new ArrayVariable(*$1,*$2);}
+| ID LP arguments RP {$$ = new FunctionCall(*$1,*$3);}
 | negative expression {$$ = new UnaryExpression($2,$1);}
 | selftune expression {$$ = new UnaryExpression($2,$1);}
 | expression calculate_ONE expression {$$ = new BinaryExpression($1,$3,$2);}

@@ -28,7 +28,7 @@ Scope::Scope(shared_ptr<Scope> parentScope) {
 
 shared_ptr<TypeSymbol> Scope::putAnonymousType() {
     ++counter;
-    return new TypeSymbol(counter,TYPESYMBOL);
+    return make_shared<TypeSymbol>(counter,TYPESYMBOL);
 }
 
 void TypeSymbol::addMember(shared_ptr<VariableSymbol> variableSymbol) {
@@ -48,11 +48,11 @@ shared_ptr<Symbol> Scope::putVariable(string variable,int SymbolType) {
     if (contains(variable)) return nullptr;
     ++counter;
     if (SymbolType == TYPESYMBOL){
-        dict[variable] = new TypeSymbol(counter,SymbolType);
+        dict[variable] = make_shared<TypeSymbol>(counter,SymbolType);
     } else if (SymbolType == VARIABLESYMBOL){
-        dict[variable] = new VariableSymbol(counter,SymbolType);
+        dict[variable] = make_shared<VariableSymbol>(counter,SymbolType);
     } else {
-        dict[variable] = new FunctionSymbol(counter,SymbolType);
+        dict[variable] = make_shared<FunctionSymbol>(counter,SymbolType);
     }
     return dict[variable];
 }
@@ -82,7 +82,7 @@ void Scope::tag() {
 }
 
 bool Scope::inloop() {
-    if (this == globeScope) return false;
+    if (this == globeScope.get()) return false;
     if (this->ScopeType == LOOPSCOPE) return true;
     return this->prev()->inloop();
 }
