@@ -10,9 +10,9 @@ class Scope;
 class VariableSymbol;
 
 class Symbol{
-    int ID;
     int SymbolType;
 public:
+	int ID;
     Symbol(){}
     Symbol(int ID,int SymbolType);
     bool hasType(int SymbolType);
@@ -22,16 +22,22 @@ class TypeSymbol : public Symbol{
 public:
     shared_ptr<Scope> memberScope;
     vector<shared_ptr<VariableSymbol>> members;
-    //TODO shared pointer
+	int size();
     void addMember(shared_ptr<VariableSymbol>);
     TypeSymbol(int ID,int SymbolType);
 };
 
 class VariableSymbol : public Symbol{
     int level;
+	int place;
+	int position;
 public:
     shared_ptr<TypeSymbol> type;
     int getLevel();
+	void setPlace(int place);
+	void setPostion(int position);
+	int inTypeID();
+	int parameterID();
     void setLevel(int level);
     VariableSymbol(int ID,int SymbolType);
 	VariableSymbol(shared_ptr<TypeSymbol> type);

@@ -1,6 +1,7 @@
 #include <iostream>
 #include "AST.h"
 #include "semanticAnalyzer.h"
+#include "MIPS.h"
 using namespace std;
 EventList* Globe;
 
@@ -20,6 +21,10 @@ void semanticAnalyze(){
     }
 }
 
+void mipsCodeGenerate(){
+    Globe->generate();
+}
+
 int main()  
 {  
     extern int yyparse(void);  
@@ -27,13 +32,13 @@ int main()
       
     yyin= fopen("test","r");
     extern int yyparse(void); 
-    if(yyparse()){  
-        fprintf(stderr,"Error! Error! Error!\n");  
+    if(yyparse()){
         return 1;
     }
 
 	semanticAnalyze();
-    
+
+    mipsCodeGenerate();
 
     return 0;
 }  

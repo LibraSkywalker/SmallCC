@@ -6,6 +6,9 @@
 #include <list>
 #include <iostream>
 #include "semanticAnalyzer.h"
+#include "Generator.h"
+#include "ConstHeader.h"
+
 using namespace std;
 
 class Node{
@@ -20,13 +23,16 @@ public:
 class Statement : public Node{
 public:
 	virtual bool check() = 0;
+    virtual void generate() = 0;
 };
 
 class Expression: public Statement{
 public:
     shared_ptr<TypeSymbol> type;
     bool left;
+    int virtualRegister;
     virtual bool check() = 0;
+    virtual void generate() = 0;
 };
 
 class EventList : public Node{
@@ -36,6 +42,7 @@ public:
     EventList(Statement* now); //use by parser
     void insert(Statement* now); //use by parser
 	bool check();
+    void generate();
 };
 
 class ExpressionList : public Node {
@@ -50,11 +57,13 @@ class Variable : public Expression {
 public:	
 	string name;
 	string type_name;
+    bool forDeclare;
     shared_ptr<VariableSymbol> variableSymbol;
     Variable(){}
     Variable(string name); //use by parser
 	Variable(string type_name,string name); //use by parser
     virtual bool check();
+    virtual void generate();
 };
 
 class ArrayVariable: public Variable{
@@ -63,6 +72,7 @@ public:
     ArrayVariable():Variable(){}
     ArrayVariable(string name,ExpressionList& position); //use by parser
     virtual bool check();
+    virtual void generate();
 };
 
 class InitVariable: public Variable{
@@ -71,6 +81,7 @@ class InitVariable: public Variable{
 public:
 	InitVariable(string name,Expression* initializer,int command); //use by parser
     bool check();
+    void generate();
 };
 
 
@@ -80,6 +91,7 @@ class InitArrayVariable : public ArrayVariable{
 public:
     InitArrayVariable(ArrayVariable& preview,ExpressionList& initializer,int command); //use by parser
     bool check();
+    void generate();
 };
 
 class VariableList : public Node{
@@ -104,6 +116,7 @@ public:
     void getName(string name); //use by parser
     void insert(Declaration* newDeclaration); //use by parser
     bool check();
+    void generate();
 };
 
 class Declaration : public Statement{
@@ -115,6 +128,7 @@ public:
     Declaration(Type* type,VariableList& variableList); //use by parser
 	Declaration(string type_name,VariableList& variableList); //use by parser
     bool check();
+    void generate();
 };
 
 class Literal : public Expression{
@@ -123,15 +137,18 @@ public:
     Literal(int data);
 	void print();
     bool check();
+    void generate();
 };
 
 class Attribute : public Expression{
     string name;
     string attribute;
 public:
+	shared_ptr<VariableSymbol> variableSymbol;
     Attribute();
     Attribute(string name,string attribute); //use by parser
     bool check();
+    void generate();
 };
 
 class FunctionCall : public Expression{
@@ -140,8 +157,10 @@ class FunctionCall : public Expression{
     FunctionCall();
 
 public:
+    shared_ptr<FunctionSymbol> functionSymbol;
     FunctionCall(string name,ExpressionList& parameters); //use by parser
     bool check();
+    void generate();
 };
 
 class UnaryExpression : public Expression{
@@ -152,6 +171,7 @@ class UnaryExpression : public Expression{
 public:
     UnaryExpression(Expression* child,int command); //use by parser
     bool check();
+    void generate();
 };
 
 class BinaryExpression : public Expression{
@@ -162,6 +182,7 @@ class BinaryExpression : public Expression{
 public:
     BinaryExpression(Expression* Left,Expression* Right,int command); //use by parser
     bool check();
+    void generate();
 };
 
 class BlockStatement : public Statement{
@@ -170,6 +191,7 @@ public:
     BlockStatement();
     BlockStatement(EventList& events);
     bool check();
+    void generate();
 };
 
 class BranchStatement : public Statement{
@@ -183,6 +205,7 @@ public:
     BranchStatement(Expression* condition, Statement* AcceptStatement); //use by parser
     BranchStatement(Expression* condition, Statement* AcceptStatement, Statement* DenyStatement); //use by parser
     bool check();
+    void generate();
 };
 
 class JumpStatement : public Statement{
@@ -193,6 +216,7 @@ public:
     JumpStatement(Expression* returnValue); //use by parser
     JumpStatement(int command); //use by parser
     bool check();
+    void generate();
 };
 
 class LoopStatement : public Statement{
@@ -203,6 +227,7 @@ public:
     LoopStatement();
     LoopStatement(Expression *initializer,Expression *condition,Expression *iteration,Statement *loopBody); //use by parser
     bool check();
+    void generate();
 };
 
 
@@ -211,6 +236,7 @@ class Function : public Statement{
     string name;
     string type_name;
     VariableList parameters;
+    shared_ptr<Scope> bodyScope;
     shared_ptr<BlockStatement> functionBody;
 
 public:
@@ -219,6 +245,7 @@ public:
     Function(string type_name,string name,VariableList& parameterList,BlockStatement* functionBody); //use by parser
     Function(string type_name,string name,BlockStatement* functionBody); //use by parser
     bool check();
+    void generate();
 };
 
 #endif //SMALLCCOMPILER_SYMBOLTABLE_H

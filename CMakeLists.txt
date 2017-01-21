@@ -12,6 +12,6 @@ set(SOURCE_FILES
     parser.cpp
     parser.hpp
     semanticAnalyzer.cpp
-    semanticAnalyzer.h)
+    semanticAnalyzer.h Generator.h)
 
 add_executable(SmallCC ${SOURCE_FILES})
