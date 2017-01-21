@@ -3,5 +3,5 @@ int main(){
 	int c,b;
 	b = a;
 	write(100);
-	return 100;
+	return 0;
 }

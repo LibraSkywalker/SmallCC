@@ -32,7 +32,16 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="AST.cpp" />
+		<Unit filename="AST.h" />
+		<Unit filename="ConstHeader.h" />
+		<Unit filename="lexer.cpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="parser.cpp" />
+		<Unit filename="parser.hpp" />
+		<Unit filename="semanticAnalyzer.cpp" />
+		<Unit filename="semanticAnalyzer.h" />
+		<Unit filename="test" />
 		<Extensions>
 			<code_completion />
 			<debugger />

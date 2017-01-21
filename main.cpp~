@@ -1,7 +1,6 @@
 #include <iostream>
 #include "AST.h"
 #include "semanticAnalyzer.h"
-#include "MIPS.h"
 using namespace std;
 EventList* Globe;
 
@@ -23,7 +22,7 @@ void semanticAnalyze(){
 
 void mipsCodeGenerate(){
     cout <<".data"<< endl << endl;
-    cout <<"VReg: .space 4096" << endl;
+    cout <<"VReg: .space 4096" << endl << endl;
     cout <<".text"<< endl << endl;
     Globe->generate();
 }

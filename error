@@ -1,0 +1,4 @@
+AST.cpp: In member function ‘virtual void BinaryExpression::generate()’:
+AST.cpp:208:13: error: ‘berak’ was not declared in this scope
+             berak;
+             ^

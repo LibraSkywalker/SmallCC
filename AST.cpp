@@ -155,7 +155,7 @@ bool BinaryExpression::check() {
 }
 
 void BinaryExpression::generate() {
-    int virtualRegister = ++counter;
+    virtualRegister = ++counter;
     this->Right->generate();
     this->Left->generate();
 
@@ -163,43 +163,102 @@ void BinaryExpression::generate() {
     loadFromVirtualRegister(RSRC2_REGISTER, Right->virtualRegister);
 
     switch (command){
-        case ADD_OP: trInstruction("add",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case SUB_OP: trInstruction("sub",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case MUL_OP: trInstruction("mul",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case DIV_OP: trInstruction("div",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case MOD_OP: trInstruction("rem",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case SGT_OP: trInstruction("sgt",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case SGE_OP: trInstruction("sge",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case SLE_OP: trInstruction("sle",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case SLT_OP: trInstruction("slt",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case SEQ_OP: trInstruction("seq",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case SNE_OP: trInstruction("sne",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case SHL_OP: trInstruction("sll",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case SHR_OP: trInstruction("srl",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case BIT_AND_OP: trInstruction("and",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case BIT_OR_OP: trInstruction("or",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case BIT_XOR_OP: trInstruction("xor",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case AND_OP: trInstruction("and",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
-        case OR_OP: trInstruction("or",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+        case ADD_OP: {
+            trInstruction("add",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+         }
+        case SUB_OP: {
+            trInstruction("sub",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case MUL_OP: {
+            trInstruction("mul",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case DIV_OP: {
+            trInstruction("div",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case MOD_OP: {
+            trInstruction("rem",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case SGT_OP: {
+            trInstruction("sgt",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case SGE_OP: {
+            trInstruction("sge",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case SLE_OP: {
+            trInstruction("sle",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case SLT_OP:{
+            trInstruction("slt",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case SEQ_OP: {
+            trInstruction("seq",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case SNE_OP: {
+            trInstruction("sne",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case SHL_OP: {
+            trInstruction("sll",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case SHR_OP: {
+            trInstruction("srl",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case BIT_AND_OP: {
+            trInstruction("and",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case BIT_OR_OP: {
+            trInstruction("or",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case BIT_XOR_OP: {
+            trInstruction("xor",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case AND_OP: {
+            trInstruction("and",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
+        case OR_OP: {
+            trInstruction("or",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            break;
+        }
         case ASSIGN_OP: {
-            brInstruction("move $%d $%d",RDEST_REGISTER,RSRC2_REGISTER);
+            brInstruction("move",RDEST_REGISTER,RSRC2_REGISTER);
             assignmentSave();
+					break;
         }
         case PLUS_ASSIGN_OP:{
             trInstruction("add",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
             assignmentSave();
+					break;
         }
         case MINUS_ASSIGN_OP:{
             trInstruction("sub",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
             assignmentSave();
+					break;
         }
         case MULTIPLY_ASSIGN_OP:{
             trInstruction("mul",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
             assignmentSave();
+					break;
         }
         case DIVIDE_ASSIGN_OP: {
             trInstruction("div",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
             assignmentSave();
+					break;
         }
         default:
             printf("error!\n");
@@ -490,22 +549,23 @@ FunctionCall::FunctionCall(string name, ExpressionList& parameters) {
 
 void FunctionCall::generate() {
     virtualRegister = ++counter;
-	
+
     for (shared_ptr<Expression> now : this->parameters.data){
         now->generate();
     }
 	if (this->name == "read"){
-		biInstruction("li",RETURNADDRESS_REGISTER,5);
+		biInstruction("li",RETURNVALUE_REGISTER,5);
 		printf("syscall\n");
-	}
-	if (this->name == "write"){
+		brInstruction("move",RDEST_REGISTER,RETURNVALUE_REGISTER);
+		assignmentSave();
+	} else if (this->name == "write"){
 		for (shared_ptr<Expression> now : this->parameters.data){
 			loadFromVirtualRegister(RSRC1_REGISTER,now->virtualRegister);
         	brInstruction("move",4,RSRC1_REGISTER);
 		}
-		biInstruction("li",RETURNADDRESS_REGISTER,1);
+		biInstruction("li",RETURNVALUE_REGISTER,1);
 		printf("syscall\n");
-		
+
 	} else {
     	int space = (int)(this->functionSymbol->parameterVariable.size()) + 3;
 
@@ -520,7 +580,7 @@ void FunctionCall::generate() {
         	loadFromVirtualRegister(RSRC1_REGISTER,now->virtualRegister);
         	saveToAddress(RSRC1_REGISTER,STACKPOINTER_REGISTER,++num);
     	}
-	
+
     	//jump
     	jumpInstruction(this->name);
 
@@ -695,7 +755,7 @@ bool Literal::check() {
 
 void Literal::generate() {
     virtualRegister = ++counter;
-    biInstruction("li $%d %d",RDEST_REGISTER,data);
+    biInstruction("li",RDEST_REGISTER,data);
     saveToVirtualRegister(RDEST_REGISTER,virtualRegister);
 }
 
@@ -875,6 +935,7 @@ Variable::Variable(string type_name,string name){
 }
 
 void Variable::generate() {
+	//printf("this variable is %s ,it's %d for declare\n",this->name.c_str(),this->forDeclare);
     virtualRegister = ++counter;
     if (!this->forDeclare){
         //is parameter

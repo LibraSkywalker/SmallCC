@@ -15,25 +15,26 @@ void semanticAnalyze(){
         if (!Globe->check()){
             cout << "Semantic check failed\n" + SystemError << endl;
         } else {
-            cout << "Semantic check succeed\n" << endl;
+         //   cout << "Semantic check succeed\n" << endl;
         }
     }
 }
 
 void mipsCodeGenerate(){
     cout <<".data"<< endl << endl;
-    cout <<"VReg: .space 4096" << endl;
+    cout <<"VReg: .space 4096" << endl << endl;
     cout <<".text"<< endl << endl;
+    currentScope = globeScope;
     Globe->generate();
 }
 
-int main()  
-{  
-    extern int yyparse(void);  
-    extern FILE *yyin;  
-      
+int main()
+{
+    extern int yyparse(void);
+    extern FILE *yyin;
+
     yyin= fopen("test","r");
-    extern int yyparse(void); 
+    extern int yyparse(void);
     if(yyparse()){
         return 1;
     }
@@ -43,4 +44,4 @@ int main()
     mipsCodeGenerate();
 
     return 0;
-}  
+}

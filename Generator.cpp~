@@ -26,11 +26,11 @@ void gotoInstruction(string label){
     cout << "b " << label << endl;
 }
 
-void saveToAddress(int source,int target,int offset = 0){
+void saveToAddress(int source,int target,int offset){
     printf("sw $%d %d($%d)",source,offset * 4,target);
 }
 
-void loadFromAddress(int source,int target,int offset = 0){
+void loadFromAddress(int source,int target,int offset){
     printf("lw $%d %d($%d)",source,offset * 4,target);
 }
 
