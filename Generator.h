@@ -12,92 +12,44 @@
 #include <iostream>
 using namespace std;
 
-void allocateMemory(int size){
-    printf("li $4 %d\n",size * 8);
-    printf("li $2 9\n");
-    printf("syscall\n");
-}
+void allocateMemory(int size);
 
-void allocateInt(){
-    printf("li $4 4\n");
-    printf("li $2 9\n");
-    printf("syscall\n");
-}
+void allocateInt();
 
-void allocateMemoryByReg(int source){
-    printf("move $4 $%d",source);
-    printf("li $2 9\n");
-    printf("syscall\n");
-}
+void allocateMemoryByReg(int source);
 
-void branchInstruction(string name,int a,string label){
-    cout << name << " $" << a << " 0 " << label << endl;
-}
+void branchInstruction(string name,int a,string label);
 
-void gotoInstruction(string label){
-    cout << "b " << label << endl;
-}
+void gotoInstruction(string label);
 
-void saveToAddress(int source,int target,int offset = 0){
-    printf("sw $%d %d($%d)",source,offset * 4,target);
-}
+void saveToAddress(int source,int target,int offset = 0);
 
-void loadFromAddress(int source,int target,int offset = 0){
-    printf("lw $%d %d($%d)",source,offset * 4,target);
-}
+void loadFromAddress(int source,int target,int offset = 0);
 
-void loadAddressFromVirtualRegister(int source, int target){
-    printf("la $t0 VReg\n");
-    printf("la $%d %d($t0)\n",source,target * 4);
-}
+void loadAddressFromVirtualRegister(int source, int target);
 
-void saveToVirtualRegister(int source,int target){
-    printf("la $t0 VReg\n");
-    printf("sw $%d %d($t0)\n",source,target * 4);
-}
+void saveToVirtualRegister(int source,int target);
 
-void trInstruction(const char* name,int target,int source1,int source2){
-    printf("%s $%d $%d $%d\n",name,target,source1,source2);
-}
+void trInstruction(const char* name,int target,int source1,int source2);
 
-void tiInstruction(const char* name,int target,int source1,int source2){
-    printf("%s $%d $%d %d\n",name,target,source1,source2);
-}
+void tiInstruction(const char* name,int target,int source1,int source2);
 
-void brInstruction(const char* name,int target,int source1){
-    printf("%s $%d $%d\n",name,target,source1);
-}
+void brInstruction(const char* name,int target,int source1);
 
-void biInstruction(const char* name,int target,int source){
-    printf("%s $%d %d\n",name,target,source);
-}
+void biInstruction(const char* name,int target,int source);
 
-void urInstruction(const char* name,int target){
-    printf("%s $%d\n",name,target);
-}
+void urInstruction(const char* name,int target);
 
-void loadFromVirtualRegister(int source, int target){
-    printf("la $t0 VReg\n");
-    printf("lw $%d %d($t0)\n",source,target * 4);
-}
+void loadFromVirtualRegister(int source, int target);
 
-void jumpInstruction(string name){
-    cout << "jal func_" << name << endl;
-}
+void jumpInstruction(string name);
 
-void exitInstruction(){
-    cout << "li $2 10" << endl;
-    cout << "syscall" << endl;
-}
+void exitInstruction();
 
-void assignmentSave(){
-    printf("sw $%d 0($%d)\n",RDEST_REGISTER,TEMPADDRESS_REGISTER);
-}
+void assignmentSave();
 
-void tagLabel(string name){
-    cout << endl << name << " :" << endl;
-}
+void tagLabel(string name);
 
 extern string currentLabel;
-string currentLabel = "";
+
 #endif //SMALLCC_GENERATOR_H
