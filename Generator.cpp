@@ -13,7 +13,8 @@ void allocateInt(){
 }
 
 void allocateMemoryByReg(int source){
-    printf("move $4 $%d",source);
+    printf("move $4 $%d\n",source);
+    printf("mul $4 $4 8\n");
     printf("li $2 9\n");
     printf("syscall\n");
 }
@@ -27,11 +28,11 @@ void gotoInstruction(string label){
 }
 
 void saveToAddress(int source,int target,int offset){
-    printf("sw $%d %d($%d)",source,offset * 4,target);
+    printf("sw $%d %d($%d)\n",source,offset * 4,target);
 }
 
 void loadFromAddress(int source,int target,int offset){
-    printf("lw $%d %d($%d)",source,offset * 4,target);
+    printf("lw $%d %d($%d)\n",source,offset * 4,target);
 }
 
 void loadAddressFromVirtualRegister(int source, int target){

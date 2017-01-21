@@ -35,6 +35,7 @@ bool ArrayVariable::check() {
             }
         }
     }
+    this->type = IntType;
     return true;
 }
 
@@ -61,7 +62,9 @@ void ArrayVariable::generate() {
             now->generate();
             loadFromVirtualRegister(RDEST_REGISTER,now->virtualRegister);
             trInstruction("add",ARRAYTEMP_REGISTER,ARRAYTEMP_REGISTER,RDEST_REGISTER);
+            tiInstruction("add",TEMP_REGISTER,TEMP_REGISTER,4);
         }
+        tiInstruction("mul",ARRAYTEMP_REGISTER,ARRAYTEMP_REGISTER,4);
         trInstruction("add",ARRAYTEMP_REGISTER,ARRAYTEMP_REGISTER,TEMP_REGISTER);
         brInstruction("move",TEMPADDRESS_REGISTER,ARRAYTEMP_REGISTER);
         // load address for possible adjust
@@ -596,6 +599,10 @@ void FunctionCall::generate() {
 
 bool FunctionCall::check() {
     shared_ptr<FunctionSymbol> thisFunction = static_pointer_cast<FunctionSymbol>(globeScope->getVariable(this->name,FUNCTIONSYMBOL));
+    if (thisFunction == nullptr){
+        SystemError = "Undeclared Function:" + name + "\n" ;
+        return false;
+    }
     if (thisFunction->parameterVariable.size() != this->parameters.data.size()){
         SystemError = "The number of parameters are not matched\n" ;
         return false;
@@ -672,12 +679,13 @@ void InitArrayVariable::generate() {
         saveToAddress(RSRC1_REGISTER, RETURNVALUE_REGISTER);
         trInstruction("mul", ARRAYTEMP_REGISTER, ARRAYTEMP_REGISTER, RSRC1_REGISTER);
     }
+
     allocateMemoryByReg(ARRAYTEMP_REGISTER);
     saveToVirtualRegister(RETURNVALUE_REGISTER,this->variableSymbol->ID);
     brInstruction("move",ARRAYTEMP_REGISTER,RETURNVALUE_REGISTER);
     for (shared_ptr<Expression> now : this->initializer.data){
         now->generate();
-        loadFromVirtualRegister(RDEST_REGISTER,virtualRegister);
+        loadFromVirtualRegister(RDEST_REGISTER,now->virtualRegister);
         saveToAddress(RDEST_REGISTER,ARRAYTEMP_REGISTER);
         tiInstruction("add",ARRAYTEMP_REGISTER,ARRAYTEMP_REGISTER,4);
     }
@@ -906,16 +914,29 @@ void UnaryExpression::generate() {
     loadFromVirtualRegister(RSRC1_REGISTER, child->virtualRegister);
 
     switch (command){
-        case BIT_NOT_OP: brInstruction("not",RDEST_REGISTER,RSRC1_REGISTER);
-        case NOT_OP: brInstruction("nor",RDEST_REGISTER,RSRC1_REGISTER);
-        case NEG_OP: brInstruction("neg",RDEST_REGISTER,RSRC1_REGISTER);
-        case INC_OP:
+        case BIT_NOT_OP: {
+            brInstruction("not",RDEST_REGISTER,RSRC1_REGISTER);
+            break;
+        }
+        case NOT_OP: {
+            brInstruction("nor",RDEST_REGISTER,RSRC1_REGISTER);
+            break;
+        }
+        case NEG_OP: {
+            brInstruction("neg",RDEST_REGISTER,RSRC1_REGISTER);
+            break;
+        }
+        case INC_OP: {
             tiInstruction("add",RDEST_REGISTER,RSRC1_REGISTER,1);
             assignmentSave();
+            break;
+        }
 
-        case DEC_OP:
+        case DEC_OP:{
             tiInstruction("sub",RDEST_REGISTER,RSRC1_REGISTER,1);
             assignmentSave();
+            break;
+        }
         default:
             printf("error!\n");
     }

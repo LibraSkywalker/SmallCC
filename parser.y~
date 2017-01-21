@@ -248,6 +248,7 @@ int yyerror(char const *str)
 {  
     extern char *yytext;  
     extern int yylineno;
+	cout << "Error." << endl;
     fprintf(stderr,"parser error near %s on line %d\n",yytext,yylineno);  
     return 0;  
 }  

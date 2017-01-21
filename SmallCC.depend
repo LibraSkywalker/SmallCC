@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1485013299 source:/home/bill1996/ClionProjects/SmallCC/AST.cpp
+1485020057 source:/home/bill1996/ClionProjects/SmallCC/AST.cpp
 	"AST.h"
 
 1485005604 /home/bill1996/ClionProjects/SmallCC/AST.h
@@ -19,7 +19,7 @@
 
 1485005498 /home/bill1996/ClionProjects/SmallCC/ConstHeader.h
 
-1485013310 source:/home/bill1996/ClionProjects/SmallCC/lexer.cpp
+1485020075 source:/home/bill1996/ClionProjects/SmallCC/lexer.cpp
 	<stdio.h>
 	<string.h>
 	<errno.h>
@@ -31,14 +31,14 @@
 	"parser.hpp"
 	<unistd.h>
 
-1485013310 /home/bill1996/ClionProjects/SmallCC/parser.hpp
+1485020075 /home/bill1996/ClionProjects/SmallCC/parser.hpp
 
-1485012708 source:/home/bill1996/ClionProjects/SmallCC/main.cpp
+1485019158 source:/home/bill1996/ClionProjects/SmallCC/main.cpp
 	<iostream>
 	"AST.h"
 	"semanticAnalyzer.h"
 
-1485013310 source:/home/bill1996/ClionProjects/SmallCC/parser.cpp
+1485020075 source:/home/bill1996/ClionProjects/SmallCC/parser.cpp
 	<stdio.h>
 	<stdlib.h>
 	<string>
@@ -62,6 +62,6 @@
 	<cstdio>
 	<iostream>
 
-1485010329 source:/home/bill1996/ClionProjects/SmallCC/Generator.cpp
+1485019538 source:/home/bill1996/ClionProjects/SmallCC/Generator.cpp
 	"Generator.h"
 

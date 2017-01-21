@@ -4,7 +4,7 @@
 using namespace std;
 EventList* Globe;
 
-void semanticAnalyze(){
+bool semanticAnalyze(){
 	{
         globeScope = currentScope = make_shared<Scope>();
         IntType = std::static_pointer_cast<TypeSymbol>(globeScope->putVariable("int",TYPESYMBOL));
@@ -13,8 +13,11 @@ void semanticAnalyze(){
 		ReadFunc->addParameter(make_shared<VariableSymbol>(IntType));
 		WriteFunc->addParameter(make_shared<VariableSymbol>(IntType));
         if (!Globe->check()){
-            cout << "Semantic check failed\n" + SystemError << endl;
+             fprintf(stderr,"Semantic check failed\n%s", SystemError.c_str());
+			cout << "Error." << endl;
+            return 1;
         } else {
+            return 0;
          //   cout << "Semantic check succeed\n" << endl;
         }
     }
@@ -28,18 +31,23 @@ void mipsCodeGenerate(){
     Globe->generate();
 }
 
-int main()
-{
+int main(int argc,char* argv[])
+{/*
+	if (argc <= 1){
+		return 1;
+	}*/
     extern int yyparse(void);
     extern FILE *yyin;
 
     yyin= fopen("test","r");
+	//freopen(argv[2],"w",stdout);
+
     extern int yyparse(void);
     if(yyparse()){
         return 1;
     }
 
-	semanticAnalyze();
+	if (semanticAnalyze() != 0) return 1;
 
     mipsCodeGenerate();
 

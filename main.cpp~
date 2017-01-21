@@ -4,7 +4,7 @@
 using namespace std;
 EventList* Globe;
 
-void semanticAnalyze(){
+bool semanticAnalyze(){
 	{
         globeScope = currentScope = make_shared<Scope>();
         IntType = std::static_pointer_cast<TypeSymbol>(globeScope->putVariable("int",TYPESYMBOL));
@@ -14,8 +14,11 @@ void semanticAnalyze(){
 		WriteFunc->addParameter(make_shared<VariableSymbol>(IntType));
         if (!Globe->check()){
             cout << "Semantic check failed\n" + SystemError << endl;
+			cout << "Error." << endl;
+            return 1;
         } else {
-            cout << "Semantic check succeed\n" << endl;
+            return 0;
+         //   cout << "Semantic check succeed\n" << endl;
         }
     }
 }
@@ -24,23 +27,29 @@ void mipsCodeGenerate(){
     cout <<".data"<< endl << endl;
     cout <<"VReg: .space 4096" << endl << endl;
     cout <<".text"<< endl << endl;
+    currentScope = globeScope;
     Globe->generate();
 }
 
-int main()  
-{  
-    extern int yyparse(void);  
-    extern FILE *yyin;  
-      
-    yyin= fopen("test","r");
-    extern int yyparse(void); 
+int main(int argc,char* argv[])
+{
+	if (argc <= 1){
+		return 1;
+	}
+    extern int yyparse(void);
+    extern FILE *yyin;
+
+    yyin= fopen(argv[1],"r");
+	freopen(argv[2],"w",stdout);
+
+    extern int yyparse(void);
     if(yyparse()){
         return 1;
     }
 
-	semanticAnalyze();
+	if (semanticAnalyze() != 0) return 1;
 
     mipsCodeGenerate();
 
     return 0;
-}  
+}

@@ -1,7 +1,8 @@
+int a[4] = {1,2,3,4};
 int main(){
-	int a,b;
-	read(a);
-	read(b);
-	write(a-b);
-	return 0;
+    int i;
+    for (i = 0; i < 4; ++i){
+        write(a[i]);
+    }
+    return 0;
 }
