@@ -10,7 +10,9 @@ int answer(int n){
 }
 
 int main(){
-	a.key = 308;
+	write(a.key);
+	a.key = 308;	
+	write(a.key);
 	a.value = 215;
 	int n;
 	read(n);

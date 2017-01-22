@@ -1,0 +1,50 @@
+This is a list of the files in my submission.
+
+5140309320-report.pdf
+
+project report
+
+lexer.l
+
+lexical analyzer
+
+parser.y
+
+syntax analyzer
+
+AST.cpp
+
+abstract syntax tree, semantic checking and code generation are did in this file. collaborate with parser, semanticAnalyzer and Generator.
+
+semanticAnalyzer.cpp
+
+semantic analyzer tools (Symbol & Scope)
+
+Generator.cpp
+
+provide a series method for mips code generation.
+
+*.h , *.hpp
+header file for the code above
+
+makefile
+
+makefile
+
+test case\*.c
+
+some test cases.
+
+README
+
+this file
+
+build environment:
+
+flex 2.5.35
+GNU Bison 3.0.2
+g++ 4.8.5 (c++11)
+SPIM 8.0
+ubuntu 14.04LTS
+
+
