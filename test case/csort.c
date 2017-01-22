@@ -1,7 +1,7 @@
 int a[10] = {9,7,2,3,1,5,0,8,6,4};
 int b[10];
 int csort(int l,int r){
-	if (l == r) return;	
+	if (l == r) return 0;	
 	int mid = (l + r) >> 1;
 	csort (l , mid);
 	csort (mid + 1,r);
@@ -29,11 +29,15 @@ int csort(int l,int r){
 		++k;
 		++j;
 	}
-	for (i = l; i <= r; i++){
+	for (i = l; i <= r; ++i){
 		a[i] = b[i];
 	}
 }
 
 int main(){
 	csort(0,9);
+	int i;
+	for (i = 0; i <= 9; ++i){
+		write(i);
+	}
 }

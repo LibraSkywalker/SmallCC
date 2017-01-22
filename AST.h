@@ -145,7 +145,7 @@ class Attribute : public Expression{
     string name;
     string attribute;
 public:
-	shared_ptr<VariableSymbol> variableSymbol;
+	shared_ptr<VariableSymbol> variableSymbol,attributeSymbol;
     Attribute();
     Attribute(string name,string attribute); //use by parser
     bool check();

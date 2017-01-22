@@ -82,10 +82,11 @@ ArrayVariable::ArrayVariable(string name, ExpressionList& position):Variable(nam
 void Attribute::generate() {
     virtualRegister = ++counter;
     loadFromVirtualRegister(RDEST_REGISTER,this->variableSymbol->ID);
-    trInstruction("add",TEMPADDRESS_REGISTER,RDEST_REGISTER,variableSymbol->inTypeID());
+    tiInstruction("add",TEMPADDRESS_REGISTER,RDEST_REGISTER,attributeSymbol->inTypeID() * 4);
+    //fprintf(stderr,"ID = %d\n",variableSymbol->inTypeID());
     //load address for possible adjust
     trackingRegister = -1;
-    loadFromAddress(RDEST_REGISTER,RDEST_REGISTER,this->variableSymbol->inTypeID());
+    loadFromAddress(RDEST_REGISTER,RDEST_REGISTER,this->attributeSymbol->inTypeID());
     saveToVirtualRegister(RDEST_REGISTER,virtualRegister);
 }
 
@@ -114,6 +115,7 @@ bool Attribute::check() {
         return false;
     }
     this->variableSymbol = thisVariable;
+    this->attributeSymbol = std::static_pointer_cast<VariableSymbol> (thisVariable->type->memberScope->getVariable(this->attribute,VARIABLESYMBOL));
     this->type = IntType;
     this->left = true;
     return true;

@@ -1,12 +1,19 @@
-int factor(int n){
-	if (n == 0) return 1;
-	if (n < 0) return -1;
-	return n * factor(n - 1);
+struct {
+	int key;
+	int value;
+} a;
+
+int answer(int n){
+	write(a.key);
+	if (n != a.key) return -1; 
+	return a.value;
 }
 
 int main(){
+	a.key = 308;
+	a.value = 215;
 	int n;
 	read(n);
-	write(factor(n));
+	write(answer(n));
 	return 0;
 }
