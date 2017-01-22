@@ -25,22 +25,25 @@ bool semanticAnalyze(){
 
 void mipsCodeGenerate(){
     cout <<".data"<< endl << endl;
-    cout <<"VReg: .space 4096" << endl << endl;
+    cout <<"VReg: .space 32768" << endl << endl;
     cout <<".text"<< endl << endl;
     currentScope = globeScope;
     Globe->generate();
 }
 
 int main(int argc,char* argv[])
-{/*
+{
+
 	if (argc <= 1){
+        fprintf(stderr,"need more arguments\n");
 		return 1;
-	}*/
+	}
+
     extern int yyparse(void);
     extern FILE *yyin;
-
-    yyin= fopen("test","r");
-	//freopen(argv[2],"w",stdout);
+    //yyin= fopen("test","r");
+    yyin= fopen(argv[1],"r");
+	freopen(argv[2],"w",stdout);
 
     extern int yyparse(void);
     if(yyparse()){

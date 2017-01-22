@@ -1,9 +1,7 @@
 #include "AST.h"
 bool ArrayVariable::check() {
     //array call
-    this->forDeclare = this->variableSymbol != nullptr;
     if (!this->forDeclare){
-
         this->variableSymbol = std::static_pointer_cast<VariableSymbol>(currentScope->getVariable(this->name,VARIABLESYMBOL)) ;
         if (this->variableSymbol == nullptr){
             SystemError = "Undeclared Variable: " + this->name + "\n";
@@ -36,6 +34,7 @@ bool ArrayVariable::check() {
         }
     }
     this->type = IntType;
+    this->left = true;
     return true;
 }
 
@@ -141,6 +140,21 @@ bool BinaryExpression::check() {
                 return false;
             case MULTIPLY_ASSIGN_OP:
                 SystemError = "Should be left value during assign";
+                return false;
+			case AND_ASSIGN_OP:
+				SystemError = "Should be left value during assign";
+                return false;
+			case XOR_ASSIGN_OP:
+				SystemError = "Should be left value during assign";
+                return false;
+			case OR_ASSIGN_OP:
+				SystemError = "Should be left value during assign";
+                return false;
+			case SHL_ASSIGN_OP:
+				SystemError = "Should be left value during assign";
+                return false;
+			case SHR_ASSIGN_OP:
+				SystemError = "Should be left value during assign";
                 return false;
             default:;
         }
@@ -260,6 +274,31 @@ void BinaryExpression::generate() {
         }
         case DIVIDE_ASSIGN_OP: {
             trInstruction("div",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            assignmentSave();
+					break;
+        }
+		case AND_ASSIGN_OP: {
+            trInstruction("and",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            assignmentSave();
+					break;
+        }
+		case XOR_ASSIGN_OP: {
+            trInstruction("xor",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            assignmentSave();
+					break;
+        }
+		case OR_ASSIGN_OP: {
+            trInstruction("or",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            assignmentSave();
+					break;
+        }
+		case SHL_ASSIGN_OP: {
+            trInstruction("sll",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
+            assignmentSave();
+					break;
+        }
+		case SHR_ASSIGN_OP: {
+            trInstruction("srl",RDEST_REGISTER,RSRC1_REGISTER,RSRC2_REGISTER);
             assignmentSave();
 					break;
         }
@@ -396,6 +435,7 @@ void Declaration::generate() {
 bool Declaration::check() {
     if (this->type_name != ""){
         for (shared_ptr<Variable> now : this->variableList.data){
+            now->declareClaim();
             shared_ptr<VariableSymbol> nowSymbol = static_pointer_cast<VariableSymbol>(currentScope->putVariable(now->name,VARIABLESYMBOL)) ;
             if (nowSymbol == nullptr) {
                 SystemError = "Variable Redeclare: "+ now->name + "\n";
@@ -409,6 +449,7 @@ bool Declaration::check() {
         if (!this->type->check()) return false;
         shared_ptr<TypeSymbol> thisType = this->type->typeSymbol;
         for (shared_ptr<Variable> now : this->variableList.data){
+            now->declareClaim();
             shared_ptr<VariableSymbol> nowSymbol = static_pointer_cast<VariableSymbol>(currentScope->putVariable(now->name,VARIABLESYMBOL));
             if (nowSymbol == nullptr) {
                 SystemError = "Variable Redeclare.";
@@ -442,6 +483,10 @@ bool EventList::check() {
         if (!event->check()){
             return false;
         }
+    }
+    if (!globeScope->foundVariable("main",FUNCTIONSYMBOL)){
+        SystemError = "There's no main in the body\n";
+        return false;
     }
     return true;
 }
@@ -494,6 +539,15 @@ bool Function::check() {
     currentScope = make_shared<Scope>(currentScope);
     thisFunction->parameterScope = currentScope;
     for (shared_ptr<Variable> parameter : parameters.data){
+        //debuging
+        parameter->declareClaim();
+        shared_ptr<VariableSymbol> nowSymbol = static_pointer_cast<VariableSymbol>(currentScope->putVariable(parameter->name,VARIABLESYMBOL)) ;
+            if (nowSymbol == nullptr) {
+                SystemError = "Variable Redeclare: "+ parameter->name + "\n";
+                return false;
+            }
+        nowSymbol->setType(IntType);
+        parameter->variableSymbol = nowSymbol;
         if (!parameter->check()){
             return false;
         }
@@ -725,8 +779,8 @@ void JumpStatement::generate() {
         urInstruction("jr",RETURNADDRESS_REGISTER);
     } else {
         int endOfLoop = (int) currentLabel.find_last_of("Loop");
-        if (endOfLoop < 4) cout << "Weirld! the length of label should not be less than 4";
-        string templateLabel = currentLabel.substr(0,(unsigned)(endOfLoop - 4));
+        if (endOfLoop < 6) cout << "Weirld! the length of label should not be less than 4";
+        string templateLabel = currentLabel.substr(0,(unsigned)(endOfLoop - 6));
         if (this->command == BREAK_OP){
             gotoInstruction(templateLabel + "_AfterLoop");
         } else {
@@ -901,8 +955,14 @@ bool UnaryExpression::check() {
         return false;
     }
     if (!child->left && ( command == INC_OP || command == DEC_OP)){
-        SystemError = "should be lvalue due to ++ or --";
+        SystemError = " should be lvalue due to ++ or --";
         return false;
+    }
+    this->type = child->type;
+    if ( command == INC_OP || command == DEC_OP){
+        this->left = true;
+    } else {
+        this->left = false;
     }
     return true;
 }
@@ -973,8 +1033,8 @@ void Variable::generate() {
     }
 }
 
+
 bool Variable::check() {
-    this->forDeclare = (this->variableSymbol != nullptr);
     if (!this->forDeclare){
         this->variableSymbol = static_pointer_cast<VariableSymbol>(currentScope->getVariable(this->name,VARIABLESYMBOL));
         if (this->variableSymbol == nullptr){
@@ -991,6 +1051,9 @@ bool Variable::check() {
     return true;
 }
 
+void Variable::declareClaim(){
+    this->forDeclare = true;
+}
 
 void VariableList::insert(Variable* now){
     data.push_front(shared_ptr<Variable>(now));

@@ -57,13 +57,16 @@ ID [a-zA-Z_]([0-9a-zA-Z_])*
 "/" {return DIV;}
 "%" {return MOD;}
 "+" {return ADD;}
+"<<=" {return LSHIFTASSIGN;}
+">>=" {return RSHIFTASSIGN;}
 "<<" {return SHL;}
 ">>" {return SHR;}
 ">" {return SGT;}
 ">=" {return SGE;}
 "<" {return SLT;}
-"<=" {return SEQ;}
+"<=" {return SLE;}
 "!=" {return SNE;}
+"==" {return SEQ;}
 "&" {return BAND;}
 "^" {return BXOR;}
 "|" {return BOR;}
@@ -74,6 +77,9 @@ ID [a-zA-Z_]([0-9a-zA-Z_])*
 "-=" {return MINUSASSIGN;}
 "*=" {return MULTIPLYASSIGN;}
 "/=" {return DIVIDEASSIGN;}
+"&=" {return ANDASSIGN;}
+"^=" {return XORASSIGN;}
+"|=" {return ORASSIGN;}
 "struct" {return STRUCT;}
 "return" {return RETURN;}
 "if" {return IF;}

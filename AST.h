@@ -54,10 +54,11 @@ public:
 };
 
 class Variable : public Expression {
-public:	
+public:
 	string name;
 	string type_name;
-    bool forDeclare;
+    bool forDeclare = false;
+    void declareClaim();
     shared_ptr<VariableSymbol> variableSymbol;
     Variable(){}
     Variable(string name); //use by parser
