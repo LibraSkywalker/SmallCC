@@ -98,7 +98,7 @@ public:
 class VariableList : public Node{
 public:
     list<shared_ptr<Variable>> data;
-    VariableList(){}
+    VariableList();
     VariableList(Variable* now);
     void insert(Variable* now);
 };
@@ -160,6 +160,7 @@ class FunctionCall : public Expression{
 public:
     shared_ptr<FunctionSymbol> functionSymbol;
     FunctionCall(string name,ExpressionList& parameters); //use by parser
+    FunctionCall(string name);
     bool check();
     void generate();
 };

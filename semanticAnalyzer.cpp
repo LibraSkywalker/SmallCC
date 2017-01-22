@@ -131,8 +131,13 @@ VariableSymbol::VariableSymbol(int ID, int SymbolType):Symbol(ID,SymbolType) {
 
 FunctionSymbol::FunctionSymbol(int ID, int SymbolType):Symbol(ID,SymbolType) {}
 
+bool Scope::contains(shared_ptr<VariableSymbol> variable,string name){
+    if (this->dict[name] == nullptr) return false;
+    return this->dict[name]->ID == variable->ID;
+}
 
 int counter = 0;
+int SymbolTag;
 shared_ptr<Scope> currentScope;
 shared_ptr<Scope> globeScope;
 shared_ptr<TypeSymbol> IntType;

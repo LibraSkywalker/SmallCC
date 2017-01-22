@@ -1,10 +1,12 @@
-int a;
+int factor(int n){
+	if (n == 0) return 1;
+	if (n < 0) return -1;
+	return factor(n - 1) * n;
+}
 
 int main(){
-	for (a = 1;;++a){
-		if (a > 10) break;
-		if (a == 5) continue;
-		write(a);
-	}
+	int n;
+	read(n);
+	write(factor(n));
 	return 0;
 }

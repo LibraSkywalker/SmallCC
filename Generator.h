@@ -7,7 +7,9 @@
 
 
 #include <string>
+#include <set>
 #include "ConstHeader.h"
+#include "semanticAnalyzer.h"
 #include <cstdio>
 #include <iostream>
 using namespace std;
@@ -42,6 +44,8 @@ void urInstruction(const char* name,int target);
 
 void loadFromVirtualRegister(int source, int target);
 
+void SpecialloadFromVirtualRegister(int source, int target);
+
 void jumpInstruction(string name);
 
 void exitInstruction();
@@ -51,5 +55,9 @@ void assignmentSave();
 void tagLabel(string name);
 
 extern string currentLabel;
+
+extern int trackingRegister;
+
+extern set<int> changeList;
 
 #endif //SMALLCC_GENERATOR_H

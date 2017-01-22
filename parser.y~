@@ -174,7 +174,7 @@ loopStatement : FOR LP expressionX SEMI expressionX SEMI expressionX RP Statemen
 ;
 
 expressionX: expression {$$ = $1;}
-| emptyexpression {$$ = $1};
+| emptyexpression {$$ = $1;}
 
 
 expression : INT {$$ = new Literal($1);}

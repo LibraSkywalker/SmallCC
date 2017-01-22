@@ -184,6 +184,7 @@ expression : INT {$$ = new Literal($1);}
 | ID arrs {$$ = new ArrayVariable(*$1,*$2);}
 | buildInFunction LP arguments RP {$$ = new FunctionCall(*$1,*$3);}
 | ID LP arguments RP {$$ = new FunctionCall(*$1,*$3);}
+| ID LP RP {$$ = new FunctionCall(*$1);}
 | SUB expression {$$ = new UnaryExpression($2,NEG_OP);}
 | NOT expression {$$ = new UnaryExpression($2,NOT_OP);}
 | BNOT expression {$$ = new UnaryExpression($2,BIT_NOT_OP);}

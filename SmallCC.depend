@@ -1,8 +1,8 @@
 # depslib dependency file v1.0
-1485054481 source:/home/bill1996/ClionProjects/SmallCC/AST.cpp
+1485067608 source:/home/bill1996/ClionProjects/SmallCC/AST.cpp
 	"AST.h"
 
-1485045643 /home/bill1996/ClionProjects/SmallCC/AST.h
+1485061908 /home/bill1996/ClionProjects/SmallCC/AST.h
 	<cstdio>
 	<string>
 	<list>
@@ -11,7 +11,7 @@
 	"Generator.h"
 	"ConstHeader.h"
 
-1485007091 /home/bill1996/ClionProjects/SmallCC/semanticAnalyzer.h
+1485066049 /home/bill1996/ClionProjects/SmallCC/semanticAnalyzer.h
 	<map>
 	<memory>
 	<vector>
@@ -19,7 +19,7 @@
 
 1485044131 /home/bill1996/ClionProjects/SmallCC/ConstHeader.h
 
-1485055600 source:/home/bill1996/ClionProjects/SmallCC/lexer.cpp
+1485066371 source:/home/bill1996/ClionProjects/SmallCC/lexer.cpp
 	<stdio.h>
 	<string.h>
 	<errno.h>
@@ -31,14 +31,14 @@
 	"parser.hpp"
 	<unistd.h>
 
-1485055600 /home/bill1996/ClionProjects/SmallCC/parser.hpp
+1485066371 /home/bill1996/ClionProjects/SmallCC/parser.hpp
 
-1485054902 source:/home/bill1996/ClionProjects/SmallCC/main.cpp
+1485066705 source:/home/bill1996/ClionProjects/SmallCC/main.cpp
 	<iostream>
 	"AST.h"
 	"semanticAnalyzer.h"
 
-1485054596 source:/home/bill1996/ClionProjects/SmallCC/parser.cpp
+1485066371 source:/home/bill1996/ClionProjects/SmallCC/parser.cpp
 	<stdio.h>
 	<stdlib.h>
 	<string>
@@ -52,16 +52,18 @@
 	<stdlib.h>
 	<stdio.h>
 
-1485005498 source:/home/bill1996/ClionProjects/SmallCC/semanticAnalyzer.cpp
+1485066365 source:/home/bill1996/ClionProjects/SmallCC/semanticAnalyzer.cpp
 	"semanticAnalyzer.h"
 	<iostream>
 
-1485008413 /home/bill1996/ClionProjects/SmallCC/Generator.h
+1485067562 /home/bill1996/ClionProjects/SmallCC/Generator.h
 	<string>
+	<set>
 	"ConstHeader.h"
+	"semanticAnalyzer.h"
 	<cstdio>
 	<iostream>
 
-1485019538 source:/home/bill1996/ClionProjects/SmallCC/Generator.cpp
+1485067537 source:/home/bill1996/ClionProjects/SmallCC/Generator.cpp
 	"Generator.h"
 

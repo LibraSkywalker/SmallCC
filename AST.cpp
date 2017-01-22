@@ -39,6 +39,7 @@ bool ArrayVariable::check() {
 }
 
 void ArrayVariable::generate() {
+    trackingRegister = -1;
     if (this->forDeclare){
         biInstruction("li", ARRAYTEMP_REGISTER, 1);
         for (shared_ptr<Expression> now : this->position.data) {
@@ -50,6 +51,7 @@ void ArrayVariable::generate() {
         }
         allocateMemoryByReg(ARRAYTEMP_REGISTER);
         saveToVirtualRegister(RETURNVALUE_REGISTER,this->variableSymbol->ID);
+        changeList.insert(this->variableSymbol->ID);
     } else {
         virtualRegister = ++counter;
         loadFromVirtualRegister(TEMP_REGISTER,this->variableSymbol->ID);
@@ -82,6 +84,7 @@ void Attribute::generate() {
     loadFromVirtualRegister(RDEST_REGISTER,this->variableSymbol->ID);
     trInstruction("add",TEMPADDRESS_REGISTER,RDEST_REGISTER,variableSymbol->inTypeID());
     //load address for possible adjust
+    trackingRegister = -1;
     loadFromAddress(RDEST_REGISTER,RDEST_REGISTER,this->variableSymbol->inTypeID());
     saveToVirtualRegister(RDEST_REGISTER,virtualRegister);
 }
@@ -504,8 +507,11 @@ void EventList::generate() {
         exitInstruction();
 
         for (shared_ptr<Statement> event : this->data){
-            if (event->classType == FUNCTION_CLASS)
+
+            if (event->classType == FUNCTION_CLASS){
+                changeList.clear();
                 event->generate();
+            }
         }
 
     } else {
@@ -516,6 +522,7 @@ void EventList::generate() {
 }
 
 ExpressionList::ExpressionList() {
+    data = list<shared_ptr<Expression>>();
     this->classType = EXPRESSIONLIST_CLASS;
 }
 
@@ -578,12 +585,14 @@ void Function::generate() {
 
     this->functionBody->generate();
 
+    urInstruction("jr",RETURNADDRESS_REGISTER);
     currentScope = currentScope->prev()->prev();
 }
 
 Function::Function(string type_name,string name,BlockStatement* functionBody){
     this->type_name = type_name;
     this->name = name;
+    this->parameters = VariableList();
     this->functionBody = shared_ptr<BlockStatement>(functionBody) ;
     this->classType = FUNCTION_CLASS;
 }
@@ -598,6 +607,11 @@ Function::Function(string type_name, string name, VariableList& parameterList, B
 
 FunctionCall::FunctionCall() {}
 
+FunctionCall::FunctionCall(string name){
+    this->name = name;
+    this->parameters = ExpressionList();
+}
+
 FunctionCall::FunctionCall(string name, ExpressionList& parameters) {
     this->name = name;
     this->parameters = parameters;
@@ -606,6 +620,12 @@ FunctionCall::FunctionCall(string name, ExpressionList& parameters) {
 
 void FunctionCall::generate() {
     virtualRegister = ++counter;
+    /*
+    for (int element : changeList){
+        fprintf(stderr,"%d ",element);
+    }
+    fprintf(stderr,"\n");
+    */
 
     for (shared_ptr<Expression> now : this->parameters.data){
         now->generate();
@@ -624,7 +644,7 @@ void FunctionCall::generate() {
 		printf("syscall\n");
 
 	} else {
-    	int space = (int)(this->functionSymbol->parameterVariable.size()) + 3;
+    	int space = (int)(this->functionSymbol->parameterVariable.size()) + changeList.size() + 3;
 
     	//save return address
    		saveToAddress(RETURNADDRESS_REGISTER,STACKPOINTER_REGISTER);
@@ -638,8 +658,22 @@ void FunctionCall::generate() {
         	saveToAddress(RSRC1_REGISTER,STACKPOINTER_REGISTER,++num);
     	}
 
+        //save used local Variable
+        for (int virtualRegister : changeList){
+            SpecialloadFromVirtualRegister(RSRC1_REGISTER,virtualRegister);
+        	saveToAddress(RSRC1_REGISTER,STACKPOINTER_REGISTER,++num);
+        }
+
     	//jump
     	jumpInstruction(this->name);
+
+        num = this->parameters.data.size();
+        //load used local Variable
+
+        for (int virtualRegister : changeList){
+        	loadFromAddress(RDEST_REGISTER,STACKPOINTER_REGISTER,++num);
+            saveToVirtualRegister(RDEST_REGISTER,virtualRegister);
+        }
 
     	//pop stack
     	tiInstruction("addu",STACKPOINTER_REGISTER,STACKPOINTER_REGISTER,space * 4);
@@ -684,6 +718,7 @@ void InitVariable::generate() {
     initializer->generate();
     loadFromVirtualRegister(RSRC1_REGISTER,initializer->virtualRegister);
     saveToVirtualRegister(RSRC1_REGISTER,variableSymbol->ID);
+    changeList.insert(variableSymbol->ID);
 }
 
 bool InitVariable::check() {
@@ -736,6 +771,7 @@ void InitArrayVariable::generate() {
 
     allocateMemoryByReg(ARRAYTEMP_REGISTER);
     saveToVirtualRegister(RETURNVALUE_REGISTER,this->variableSymbol->ID);
+    changeList.insert(this->variableSymbol->ID);
     brInstruction("move",ARRAYTEMP_REGISTER,RETURNVALUE_REGISTER);
     for (shared_ptr<Expression> now : this->initializer.data){
         now->generate();
@@ -1027,6 +1063,11 @@ void Variable::generate() {
         } else {
             loadAddressFromVirtualRegister(TEMPADDRESS_REGISTER, this->variableSymbol->ID);
             // load address for possible adjust
+            if (this->variableSymbol->type == IntType && !globeScope->contains(this->variableSymbol,this->name)){
+                trackingRegister = this->variableSymbol->ID;
+            } else {
+                trackingRegister = -1;
+            }
             loadFromVirtualRegister(RDEST_REGISTER, this->variableSymbol->ID);
         }
         saveToVirtualRegister(RDEST_REGISTER, virtualRegister);
@@ -1057,6 +1098,11 @@ void Variable::declareClaim(){
 
 void VariableList::insert(Variable* now){
     data.push_front(shared_ptr<Variable>(now));
+}
+
+VariableList::VariableList(){
+    data = list<shared_ptr<Variable>>();
+    this->classType = VARIABLELIST_CLASS;
 }
 
 VariableList::VariableList(Variable* now) {

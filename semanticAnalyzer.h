@@ -72,9 +72,11 @@ public:
     bool foundVariable(string variable,int SymbolType);
     shared_ptr<Symbol> getVariable(string variable,int SymbolType);
     bool contains(string variable);
+    bool contains(shared_ptr<VariableSymbol> variable,string name);
 };
 
 extern int counter;
+extern int SymbolTag;
 extern shared_ptr<Scope> currentScope;
 extern shared_ptr<Scope> globeScope;
 extern shared_ptr<TypeSymbol> IntType;

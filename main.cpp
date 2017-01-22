@@ -28,6 +28,7 @@ void mipsCodeGenerate(){
     cout <<"VReg: .space 32768" << endl << endl;
     cout <<".text"<< endl << endl;
     currentScope = globeScope;
+    SymbolTag = counter;
     Globe->generate();
 }
 

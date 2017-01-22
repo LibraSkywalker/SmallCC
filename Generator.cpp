@@ -43,6 +43,10 @@ void loadAddressFromVirtualRegister(int source, int target){
 void saveToVirtualRegister(int source,int target){
     printf("la $t0 VReg\n");
     printf("sw $%d %d($t0)\n",source,target * 4);
+    if (target > SymbolTag){
+        // expression active
+        changeList.insert(target);
+    }
 }
 
 void trInstruction(const char* name,int target,int source1,int source2){
@@ -68,6 +72,15 @@ void urInstruction(const char* name,int target){
 void loadFromVirtualRegister(int source, int target){
     printf("la $t0 VReg\n");
     printf("lw $%d %d($t0)\n",source,target * 4);
+    if (target > SymbolTag){
+        // expression deactive
+        changeList.erase(target);
+    }
+}
+
+void SpecialloadFromVirtualRegister(int source, int target){
+    printf("la $t0 VReg\n");
+    printf("lw $%d %d($t0)\n",source,target * 4);
 }
 
 void jumpInstruction(string name){
@@ -80,6 +93,10 @@ void exitInstruction(){
 }
 
 void assignmentSave(){
+    if (trackingRegister > -1){
+        changeList.insert(trackingRegister);
+        trackingRegister = -1;
+    }
     printf("sw $%d 0($%d)\n",RDEST_REGISTER,TEMPADDRESS_REGISTER);
 }
 
@@ -88,3 +105,5 @@ void tagLabel(string name){
 }
 
 string currentLabel = "";
+int trackingRegister = -1;
+set<int> changeList = set<int>();
